@@ -1,0 +1,85 @@
+import { useState, useEffect } from 'react';
+import { SiteDataProvider } from './context/SiteDataContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { Header } from './components/photographer/Header';
+import { HeroSection } from './components/photographer/HeroSection';
+import { VisionSection } from './components/photographer/VisionSection';
+import { ServicesSection } from './components/photographer/ServicesSection';
+import { PortfolioShowcase } from './components/photographer/PortfolioShowcase';
+import { TestimonialsSection } from './components/photographer/TestimonialsSection';
+import { ContactSection } from './components/photographer/ContactSection';
+import { Footer } from './components/photographer/Footer';
+import { AdminPanel } from './components/admin/AdminPanel';
+import { Toaster } from './components/ui/sonner';
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
+
+  useEffect(() => {
+    // Simple routing based on URL path
+    const path = window.location.pathname;
+    if (path === '/admin') {
+      setCurrentPage('admin');
+    } else {
+      setCurrentPage('home');
+    }
+
+    // Listen for navigation
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      setCurrentPage(path === '/admin' ? 'admin' : 'home');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Handle navigation
+  useEffect(() => {
+    const links = document.querySelectorAll('a[href^="/"]');
+    links.forEach(link => {
+      link.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+        if (href) {
+          window.history.pushState({}, '', href);
+          setCurrentPage(href === '/admin' ? 'admin' : 'home');
+          window.scrollTo(0, 0);
+        }
+      });
+    });
+  }, [currentPage]);
+
+  return (
+    <SiteDataProvider>
+      <LanguageProvider>
+        <Toaster position="top-center" richColors />
+        
+        {currentPage === 'admin' ? (
+          <AdminPanel />
+        ) : (
+          <div className="min-h-screen bg-[#0A0A0A] antialiased">
+            <Header />
+            <main id="home">
+              <HeroSection />
+              <VisionSection />
+              <div id="services">
+                <ServicesSection />
+              </div>
+              <div id="portfolio">
+                <PortfolioShowcase />
+              </div>
+              <div id="testimonials">
+                <TestimonialsSection />
+              </div>
+              <div id="contact">
+                <ContactSection />
+              </div>
+            </main>
+            <Footer />
+          </div>
+        )}
+      </LanguageProvider>
+    </SiteDataProvider>
+  );
+}
