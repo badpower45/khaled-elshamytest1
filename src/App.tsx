@@ -11,6 +11,8 @@ import { ContactSection } from './components/photographer/ContactSection';
 import { Footer } from './components/photographer/Footer';
 import { AdminPanel } from './components/admin/AdminPanel';
 import { Toaster } from './components/ui/sonner';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Login } from './components/admin/Login';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
@@ -56,7 +58,9 @@ export default function App() {
         <Toaster position="top-center" richColors />
         
         {currentPage === 'admin' ? (
-          <AdminPanel />
+          <RequireAdmin>
+            <AdminPanel />
+          </RequireAdmin>
         ) : (
           <div className="min-h-screen bg-[#0A0A0A] antialiased">
             <Header />
@@ -82,4 +86,10 @@ export default function App() {
       </LanguageProvider>
     </SiteDataProvider>
   );
+}
+
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Login />;
+  return <>{children}</>;
 }
