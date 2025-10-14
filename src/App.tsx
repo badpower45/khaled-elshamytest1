@@ -18,8 +18,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
 
   useEffect(() => {
-    // Simple routing based on URL path
-    const path = window.location.pathname;
+    // Support GitHub Pages base path
+    const base = '/khaled-elshamytest1';
+    const path = window.location.pathname.replace(base, '');
     if (path === '/admin') {
       setCurrentPage('admin');
     } else {
@@ -28,7 +29,7 @@ export default function App() {
 
     // Listen for navigation
     const handlePopState = () => {
-      const path = window.location.pathname;
+      const path = window.location.pathname.replace(base, '');
       setCurrentPage(path === '/admin' ? 'admin' : 'home');
     };
 
@@ -38,6 +39,7 @@ export default function App() {
 
   // Handle navigation
   useEffect(() => {
+    const base = '/khaled-elshamytest1';
     const links = document.querySelectorAll('a[href^="/"]');
     links.forEach(link => {
       link.addEventListener('click', (e: Event) => {
@@ -45,7 +47,8 @@ export default function App() {
         const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
         if (href) {
           window.history.pushState({}, '', href);
-          setCurrentPage(href === '/admin' ? 'admin' : 'home');
+          const path = href.replace(base, '');
+          setCurrentPage(path === '/admin' ? 'admin' : 'home');
           window.scrollTo(0, 0);
         }
       });
