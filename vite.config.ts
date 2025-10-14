@@ -4,6 +4,9 @@
   import path from 'path';
 
   export default defineConfig({
+    // Required when deploying to GitHub Pages under a repository path
+    // so asset URLs are prefixed with the repo name.
+    base: '/khaled-elshamytest1/',
     plugins: [react()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
