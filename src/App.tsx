@@ -18,9 +18,13 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
 
   useEffect(() => {
-    // Support GitHub Pages base path
     const base = '/khaled-elshamytest1';
-    const path = window.location.pathname.replace(base, '');
+    const isDev = import.meta.env.DEV;
+    const getPath = () => {
+      if (isDev) return window.location.pathname;
+      return window.location.pathname.replace(base, '');
+    };
+    const path = getPath();
     if (path === '/admin') {
       setCurrentPage('admin');
     } else {
@@ -29,7 +33,7 @@ export default function App() {
 
     // Listen for navigation
     const handlePopState = () => {
-      const path = window.location.pathname.replace(base, '');
+      const path = getPath();
       setCurrentPage(path === '/admin' ? 'admin' : 'home');
     };
 
@@ -40,6 +44,7 @@ export default function App() {
   // Handle navigation
   useEffect(() => {
     const base = '/khaled-elshamytest1';
+    const isDev = import.meta.env.DEV;
     const links = document.querySelectorAll('a[href^="/"]');
     links.forEach(link => {
       link.addEventListener('click', (e: Event) => {
@@ -47,7 +52,7 @@ export default function App() {
         const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
         if (href) {
           window.history.pushState({}, '', href);
-          const path = href.replace(base, '');
+          const path = isDev ? href : href.replace(base, '');
           setCurrentPage(path === '/admin' ? 'admin' : 'home');
           window.scrollTo(0, 0);
         }

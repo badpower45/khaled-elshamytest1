@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+const isDev = import.meta.env && import.meta.env.DEV;
 import { useState, useEffect } from 'react';
 import { Menu, X, Camera, Languages } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -109,7 +110,7 @@ export function Header() {
             </motion.button>
 
             <motion.a
-              href="/khaled-elshamytest1/admin"
+              href={isDev ? "/admin" : "/khaled-elshamytest1/admin"}
               className="bg-[#FFC107] text-black px-4 xl:px-6 py-2 rounded-lg font-['Inter'] hover:bg-[#FFD54F] transition-colors whitespace-nowrap"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -178,7 +179,7 @@ export function Header() {
               ))}
               
               <motion.a
-                href="/khaled-elshamytest1/admin"
+                href={isDev ? "/admin" : "/khaled-elshamytest1/admin"}
                 className="bg-[#FFC107] text-black px-6 py-3 rounded-lg font-['Inter'] text-center hover:bg-[#FFD54F] transition-colors"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}

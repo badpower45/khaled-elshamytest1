@@ -50,6 +50,8 @@ export interface SocialMedia {
   instagram: string;
   facebook: string;
   tiktok: string;
+  linkedin?: string;
+  youtube?: string;
 }
 
 export interface PersonalInfo {

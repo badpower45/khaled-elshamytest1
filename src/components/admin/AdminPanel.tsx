@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+// Supabase config
+const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
+const supabase = createClient(supabaseUrl, supabaseKey);
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -8,14 +13,33 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Card } from '../ui/card';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
+// Dummy save handler for tabs that need explicit save
+function handleSave(section: string) {
+  toast.success(`تم حفظ التغييرات في قسم: ${section}`);
+}
 
 export function AdminPanel() {
   const { data, updatePersonalInfo, updateService, updatePortfolio, updateTestimonial, updateAward, updateContactInfo, updateSocialMedia } = useSiteData();
   const [activeTab, setActiveTab] = useState('personal');
 
-  const handleSave = (section: string) => {
-    toast.success(`تم حفظ تعديلات ${section} بنجاح!`);
+  // Supabase contact save
+  // Auto-save contact info to Supabase
+  const autoSaveContact = async (partial: any) => {
+    // Update local state
+    updateContactInfo(partial);
+    // Save to Supabase
+    const contact = {
+      ...data.contactInfo,
+      ...partial,
+      studio_address: partial.studioAddress ?? data.contactInfo.studioAddress,
+      weekdays: partial.workingHours?.weekdays ?? data.contactInfo.workingHours.weekdays,
+      friday: partial.workingHours?.friday ?? data.contactInfo.workingHours.friday,
+      emergency: partial.workingHours?.emergency ?? data.contactInfo.workingHours.emergency,
+      created_at: new Date().toISOString(),
+    };
+    const { error } = await supabase.from('contacts').insert([contact]);
+    if (error) toast.error('خطأ في الحفظ: ' + error.message);
   };
 
   return (
@@ -563,7 +587,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">البريد الإلكتروني</label>
                   <Input
                     value={data.contactInfo.email}
-                    onChange={(e) => updateContactInfo({ email: e.target.value })}
+                    onChange={(e) => autoSaveContact({ email: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                     type="email"
                   />
@@ -573,7 +597,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">الهاتف</label>
                   <Input
                     value={data.contactInfo.phone}
-                    onChange={(e) => updateContactInfo({ phone: e.target.value })}
+                    onChange={(e) => autoSaveContact({ phone: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                   />
                 </div>
@@ -582,7 +606,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">الموقع</label>
                   <Input
                     value={data.contactInfo.location}
-                    onChange={(e) => updateContactInfo({ location: e.target.value })}
+                    onChange={(e) => autoSaveContact({ location: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                   />
                 </div>
@@ -591,7 +615,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">عنوان الاستوديو</label>
                   <Input
                     value={data.contactInfo.studioAddress}
-                    onChange={(e) => updateContactInfo({ studioAddress: e.target.value })}
+                    onChange={(e) => autoSaveContact({ studioAddress: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white text-right"
                     dir="rtl"
                   />
@@ -604,9 +628,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">أيام الأسبوع</label>
                       <Input
                         value={data.contactInfo.workingHours.weekdays}
-                        onChange={(e) => updateContactInfo({ 
-                          workingHours: { ...data.contactInfo.workingHours, weekdays: e.target.value }
-                        })}
+                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, weekdays: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
@@ -616,9 +638,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">الجمعة</label>
                       <Input
                         value={data.contactInfo.workingHours.friday}
-                        onChange={(e) => updateContactInfo({ 
-                          workingHours: { ...data.contactInfo.workingHours, friday: e.target.value }
-                        })}
+                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, friday: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
@@ -628,9 +648,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">الطوارئ</label>
                       <Input
                         value={data.contactInfo.workingHours.emergency}
-                        onChange={(e) => updateContactInfo({ 
-                          workingHours: { ...data.contactInfo.workingHours, emergency: e.target.value }
-                        })}
+                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, emergency: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
@@ -639,15 +657,7 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              <div className="mt-8 flex justify-end">
-                <Button 
-                  onClick={() => handleSave('معلومات التواصل')}
-                  className="bg-[#FFC107] text-black hover:bg-[#FFD54F]"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  حفظ التغييرات
-                </Button>
-              </div>
+              {/* الحفظ التلقائي: لا يوجد زر حفظ */}
             </Card>
           </TabsContent>
 

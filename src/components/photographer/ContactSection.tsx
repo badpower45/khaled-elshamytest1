@@ -1,4 +1,10 @@
 import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+// Supabase config
+const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
+const supabase = createClient(supabaseUrl, supabaseKey);
 import { Mail, Phone, MapPin, Clock, Instagram, Facebook, Linkedin, Youtube, Video } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -10,6 +16,38 @@ export function ContactSection() {
   const { data } = useSiteData();
   const { contactInfo, socialMedia, personalInfo } = data;
   const { language } = useLanguage();
+
+  // Form state
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSending(true);
+    setSuccess(false);
+    setError('');
+    const { error } = await supabase.from('messages').insert([
+      {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        message: form.message,
+        created_at: new Date().toISOString(),
+      }
+    ]);
+    setSending(false);
+    if (error) setError('حدث خطأ أثناء الإرسال');
+    else {
+      setSuccess(true);
+      setForm({ name: '', email: '', phone: '', message: '' });
+    }
+  };
 
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-32 bg-gradient-to-b from-[#1A1A1A] to-[#0A0A0A] relative overflow-hidden">
@@ -187,16 +225,18 @@ export function ContactSection() {
                     <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
                   </motion.a>
 
-                  <motion.a
-                    href={socialMedia.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center border border-[#FFC107]/20 hover:border-[#FFC107] transition-colors"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
-                  </motion.a>
+                  {typeof socialMedia.linkedin === 'string' && socialMedia.linkedin.trim() !== '' && (
+                    <motion.a
+                      href={String(socialMedia.linkedin)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center border border-[#FFC107]/20 hover:border-[#FFC107] transition-colors"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
+                    </motion.a>
+                  )}
 
                   <motion.a
                     href={socialMedia.tiktok}
@@ -209,16 +249,18 @@ export function ContactSection() {
                     <Video className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
                   </motion.a>
 
-                  <motion.a
-                    href={socialMedia.youtube}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center border border-[#FFC107]/20 hover:border-[#FFC107] transition-colors"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
-                  </motion.a>
+                  {typeof socialMedia.youtube === 'string' && socialMedia.youtube.trim() !== '' && (
+                    <motion.a
+                      href={String(socialMedia.youtube)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center border border-[#FFC107]/20 hover:border-[#FFC107] transition-colors"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFC107]" />
+                    </motion.a>
+                  )}
                 </div>
               </motion.div>
             </div>
@@ -236,13 +278,16 @@ export function ContactSection() {
                 أرسل لنا رسالة
               </h3>
 
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-white mb-2 text-right font-['Inter']">
                     الاسم
                   </label>
                   <Input 
                     type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
                     placeholder="اسمك الكريم"
                     className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 text-right"
                     dir="rtl"
@@ -255,6 +300,9 @@ export function ContactSection() {
                   </label>
                   <Input 
                     type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
                     placeholder="example@email.com"
                     className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
                   />
@@ -266,6 +314,9 @@ export function ContactSection() {
                   </label>
                   <Input 
                     type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
                     placeholder="+20 xxx xxx xxxx"
                     className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
                   />
@@ -276,6 +327,9 @@ export function ContactSection() {
                     رسالتك
                   </label>
                   <Textarea 
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
                     placeholder="أخبرنا عن مشروعك..."
                     rows={5}
                     className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 text-right resize-none"
@@ -290,9 +344,12 @@ export function ContactSection() {
                   <Button 
                     type="submit"
                     className="w-full bg-gradient-to-r from-[#FFC107] to-[#FFD54F] text-black hover:shadow-lg hover:shadow-[#FFC107]/25 font-['Inter']"
+                    disabled={sending}
                   >
-                    إرسال الرسالة
+                    {sending ? '...جاري الإرسال' : 'إرسال الرسالة'}
                   </Button>
+                {success && <p className="text-green-400 mt-2 text-center">تم إرسال الرسالة بنجاح!</p>}
+                {error && <p className="text-red-400 mt-2 text-center">{error}</p>}
                 </motion.div>
               </form>
             </div>
