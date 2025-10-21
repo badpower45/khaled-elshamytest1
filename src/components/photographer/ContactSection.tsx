@@ -1,10 +1,6 @@
 import { motion } from 'motion/react';
 import React, { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-// Supabase config
-const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../../lib/supabase';
 import { Mail, Phone, MapPin, Clock, Instagram, Facebook, Linkedin, Youtube, Video } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';

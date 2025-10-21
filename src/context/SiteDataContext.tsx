@@ -194,7 +194,25 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => {
     try {
       const raw = localStorage.getItem('siteData');
-      if (raw) return JSON.parse(raw) as SiteData;
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<SiteData>;
+        // import deepMerge from above local helper if available; replicate minimal merge here
+        function shallowMerge(base: any, ov: any) {
+          if (!ov) return base;
+          const out: any = Array.isArray(base) ? ov : { ...base };
+          Object.keys(ov).forEach(k => {
+            const bv = base[k];
+            const vv = ov[k];
+            if (bv && typeof bv === 'object' && !Array.isArray(bv) && vv && typeof vv === 'object' && !Array.isArray(vv)) {
+              out[k] = { ...bv, ...vv };
+            } else {
+              out[k] = vv;
+            }
+          });
+          return out;
+        }
+        return shallowMerge(initialData, parsed) as SiteData;
+      }
     } catch (e) {
       // ignore parse errors
     }
