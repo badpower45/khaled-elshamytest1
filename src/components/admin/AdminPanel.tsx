@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
@@ -45,6 +45,18 @@ export function AdminPanel() {
     const { error } = await supabase.from('contacts').insert([contact]);
     if (error) toast.error('خطأ في الحفظ: ' + error.message);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase.from('contacts').select('*');
+      if (error) {
+        console.error('Error fetching data:', error.message);
+      } else {
+        updateContactInfo(data[0]); // تحديث البيانات في الحالة المحلية
+      }
+    };
+    fetchData();
+  }, []);
 
   if (!isAuthenticated) {
     return <Login onSuccess={() => setIsAuthenticated(true)} />;
