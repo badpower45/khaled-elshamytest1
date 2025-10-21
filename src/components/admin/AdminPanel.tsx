@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-// Supabase config
-const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
-const supabase = createClient(supabaseUrl, supabaseKey);
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -14,6 +10,13 @@ import { Textarea } from '../ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Card } from '../ui/card';
 import { toast } from 'sonner';
+import { Login } from './Login';
+
+// Supabase config
+const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 // Dummy save handler for tabs that need explicit save
 function handleSave(section: string) {
   toast.success(`تم حفظ التغييرات في قسم: ${section}`);
@@ -22,6 +25,7 @@ function handleSave(section: string) {
 export function AdminPanel() {
   const { data, updatePersonalInfo, updateService, updatePortfolio, updateTestimonial, updateAward, updateContactInfo, updateSocialMedia } = useSiteData();
   const [activeTab, setActiveTab] = useState('personal');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Supabase contact save
   // Auto-save contact info to Supabase
@@ -42,30 +46,15 @@ export function AdminPanel() {
     if (error) toast.error('خطأ في الحفظ: ' + error.message);
   };
 
+  if (!isAuthenticated) {
+    return <Login onSuccess={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 border-b border-[#FFC107]/20 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <a 
-                href="/"
-                className="flex items-center gap-2 text-gray-400 hover:text-[#FFC107] transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="font-['Inter'] text-sm sm:text-base">العودة</span>
-              </a>
-            </div>
-            
-            <h1 className="text-lg sm:text-xl lg:text-2xl text-[#FFC107] font-['Playfair_Display'] italic text-center">
-              لوحة التحكم
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-12">
+      {/* Removed Header */}
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <h1 className="text-white text-2xl">Welcome to Admin Panel</h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-1 sm:gap-2 bg-gray-900/50 p-1 sm:p-2 rounded-xl mb-6 sm:mb-8 overflow-x-auto">
             <TabsTrigger value="personal" className="data-[state=active]:bg-[#FFC107] data-[state=active]:text-black text-xs sm:text-sm whitespace-nowrap">
@@ -598,15 +587,6 @@ export function AdminPanel() {
                   <Input
                     value={data.contactInfo.phone}
                     onChange={(e) => autoSaveContact({ phone: e.target.value })}
-                    className="bg-gray-800 border-gray-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white mb-2 text-right font-['Inter']">الموقع</label>
-                  <Input
-                    value={data.contactInfo.location}
-                    onChange={(e) => autoSaveContact({ location: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                   />
                 </div>

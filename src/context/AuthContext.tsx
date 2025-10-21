@@ -23,6 +23,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
+    // Automatically authenticate for admin panel
+    if (window.location.pathname.includes('/admin')) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
     try {
       if (isAuthenticated) localStorage.setItem('isAuthenticated', '1');
       else localStorage.removeItem('isAuthenticated');
