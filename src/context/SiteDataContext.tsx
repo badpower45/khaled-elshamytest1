@@ -213,6 +213,34 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
   // Sync with Supabase: fetch on mount, then debounce-upsert on changes
   const saveTimeout = useRef<number | null>(null);
 
+  // small deep-merge to ensure remote partial data doesn't remove required fields
+  function deepMerge<T>(base: T, override: Partial<T>): T {
+    if (override === null || override === undefined) return base;
+    if (Array.isArray(base) || Array.isArray(override)) {
+      // prefer override arrays when provided
+      return ((override as any) ?? base) as any;
+    }
+    if (typeof base !== 'object' || typeof override !== 'object') {
+      return ((override as any) ?? base) as any;
+    }
+    const out: any = Array.isArray(base) ? [] : { ...base };
+    const keys = new Set([...Object.keys(base as any), ...Object.keys(override as any)]);
+    keys.forEach((k) => {
+      const bv = (base as any)[k];
+      const ov = (override as any)[k];
+      if (ov === undefined) {
+        out[k] = bv;
+      } else if (bv === undefined) {
+        out[k] = ov;
+      } else if (typeof bv === 'object' && bv !== null && typeof ov === 'object' && ov !== null && !Array.isArray(bv)) {
+        out[k] = deepMerge(bv, ov);
+      } else {
+        out[k] = ov;
+      }
+    });
+    return out as T;
+  }
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -223,8 +251,8 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
           return;
         }
         if (rows && rows.length && mounted) {
-          const remote = rows[0].data;
-          if (remote) setData(remote as SiteData);
+          const remote = rows[0].data as Partial<SiteData> | null;
+          if (remote) setData(deepMerge(initialData, remote) as SiteData);
         }
       } catch (err) {
         console.warn('Supabase fetch failed:', err);
@@ -311,7 +339,8 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
   };
 
   const setAllData = (d: SiteData) => {
-    setData(d);
+    // merge with defaults to avoid missing fields causing runtime errors
+    setData(deepMerge(initialData, d));
   };
 
   return (
