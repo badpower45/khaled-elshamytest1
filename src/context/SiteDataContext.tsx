@@ -189,7 +189,24 @@ interface SiteDataContextType {
 const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined);
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<SiteData>(initialData);
+  const [data, setData] = useState<SiteData>(() => {
+    try {
+      const raw = localStorage.getItem('siteData');
+      if (raw) return JSON.parse(raw) as SiteData;
+    } catch (e) {
+      // ignore parse errors
+    }
+    return initialData;
+  });
+
+  // Persist to localStorage whenever data changes
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('siteData', JSON.stringify(data));
+    } catch (e) {
+      // ignore storage errors (quota, private mode, etc.)
+    }
+  }, [data]);
 
   const updatePersonalInfo = (info: Partial<SiteData['personalInfo']>) => {
     setData(prev => ({
