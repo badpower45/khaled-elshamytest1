@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import { supabase } from '../lib/supabase';
 import { SiteData } from '../types';
 import khaledImage from 'figma:asset/6f9a3b49d9d5a7cf854a44a26780766d0a9dba89.png';
 
@@ -206,6 +207,57 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       // ignore storage errors (quota, private mode, etc.)
     }
+  }, [data]);
+
+  // Sync with Supabase: fetch on mount, then debounce-upsert on changes
+  const saveTimeout = useRef<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data: rows, error } = await supabase.from('site').select('data').eq('id', 1).limit(1);
+        if (error) {
+          console.warn('Supabase fetch error (site table?):', error.message);
+          return;
+        }
+        if (rows && rows.length && mounted) {
+          const remote = rows[0].data;
+          if (remote) setData(remote as SiteData);
+        }
+      } catch (err) {
+        console.warn('Supabase fetch failed:', err);
+      }
+    })();
+
+    return () => { mounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // debounce save
+    if (saveTimeout.current) {
+      window.clearTimeout(saveTimeout.current);
+    }
+    saveTimeout.current = window.setTimeout(async () => {
+      try {
+  const payload = [{ id: 1, data }];
+  const { error } = await supabase.from('site').upsert(payload);
+        if (error) {
+          console.warn('Supabase upsert error:', error.message);
+          // If table missing, log SQL to create it
+          if (error.message && /relation .* does not exist/.test(error.message)) {
+            console.info(`Run this SQL in Supabase SQL editor to create table:\n
+create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at timestamptz default now()\n);\n\ninsert into public.site (id, data) values (1, '{}');`);
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase upsert failed:', err);
+      }
+    }, 1500);
+
+    return () => { if (saveTimeout.current) window.clearTimeout(saveTimeout.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const updatePersonalInfo = (info: Partial<SiteData['personalInfo']>) => {
