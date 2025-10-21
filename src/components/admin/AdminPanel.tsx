@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/supabase';
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -12,10 +12,6 @@ import { Card } from '../ui/card';
 import { toast } from 'sonner';
 import { Login } from './Login';
 
-// Supabase config
-const supabaseUrl = 'https://kbjdmogbswqsjzxldbka.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiamRtb2dic3dxc2p6eGxkYmthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MDQ1MjYsImV4cCI6MjA3NjM4MDUyNn0.ETu4jBhVdDoLGd3rmNfvcyDGnkDoG3hf6nwkrYXMOso';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Dummy save handler for tabs that need explicit save
 function handleSave(section: string) {
@@ -26,6 +22,33 @@ export function AdminPanel() {
   const { data, updatePersonalInfo, updateService, updatePortfolio, updateTestimonial, updateAward, updateContactInfo, updateSocialMedia } = useSiteData();
   const [activeTab, setActiveTab] = useState('personal');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { setAllData } = useSiteData();
+
+  const saveToCloud = async () => {
+    try {
+      const payload = [{ id: 1, data }];
+      const { error } = await supabase.from('site').upsert(payload);
+      if (error) toast.error('خطأ في الحفظ على السحابة: ' + error.message);
+      else toast.success('تم الحفظ على السحابة');
+    } catch (err: any) {
+      toast.error('Save error: ' + String(err?.message || err));
+    }
+  };
+
+  const loadFromCloud = async () => {
+    try {
+      const { data: rows, error } = await supabase.from('site').select('data').eq('id', 1).limit(1);
+      if (error) return toast.error('خطأ في التحميل: ' + error.message);
+      if (rows && rows.length) {
+        setAllData(rows[0].data as any);
+        toast.success('تم التحميل من السحابة');
+      } else {
+        toast('لا يوجد بيانات في السحابة');
+      }
+    } catch (err: any) {
+      toast.error('Load error: ' + String(err?.message || err));
+    }
+  };
 
   // Supabase contact save
   // Auto-save contact info to Supabase
@@ -69,6 +92,10 @@ export function AdminPanel() {
         <h1 className="text-white text-2xl">Welcome to Admin Panel</h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-1 sm:gap-2 bg-gray-900/50 p-1 sm:p-2 rounded-xl mb-6 sm:mb-8 overflow-x-auto">
+            <div className="col-span-full flex justify-end gap-2 p-2">
+              <Button onClick={saveToCloud} className="bg-[#10B981]">حفظ على السحابة</Button>
+              <Button onClick={loadFromCloud} className="bg-[#3B82F6]">تحميل من السحابة</Button>
+            </div>
             <TabsTrigger value="personal" className="data-[state=active]:bg-[#FFC107] data-[state=active]:text-black text-xs sm:text-sm whitespace-nowrap">
               <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">المعلومات</span>

@@ -185,6 +185,7 @@ interface SiteDataContextType {
   updateAward: (id: string, award: Partial<SiteData['awards'][0]>) => void;
   updateContactInfo: (info: Partial<SiteData['contactInfo']>) => void;
   updateSocialMedia: (social: Partial<SiteData['socialMedia']>) => void;
+  setAllData: (d: SiteData) => void;
 }
 
 const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined);
@@ -309,6 +310,10 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
     }));
   };
 
+  const setAllData = (d: SiteData) => {
+    setData(d);
+  };
+
   return (
     <SiteDataContext.Provider
       value={{
@@ -319,7 +324,8 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
         updateTestimonial,
         updateAward,
         updateContactInfo,
-        updateSocialMedia
+        updateSocialMedia,
+        setAllData
       }}
     >
       {children}
