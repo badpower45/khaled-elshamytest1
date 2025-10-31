@@ -3,7 +3,7 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { Camera, Aperture } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';
-import heroImage from 'figma:asset/38b77a41e54f70c87354413e85beb7820e75e8c3.png';
+import heroImage from '@/assets/hero-image.jpg';
 
 export function HeroSection() {
   const { data } = useSiteData();
