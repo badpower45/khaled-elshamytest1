@@ -223,11 +223,14 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
           });
           return out;
         }
-        return shallowMerge(initialData, parsed) as SiteData;
+        const merged = shallowMerge(initialData, parsed) as SiteData;
+        console.log('📦 Loaded data from localStorage, portfolio count:', merged.portfolio?.length || 0);
+        return merged;
       }
     } catch (e) {
       // ignore parse errors
     }
+    console.log('📦 Using initial data, portfolio count:', initialData.portfolio.length);
     return initialData;
   });
 

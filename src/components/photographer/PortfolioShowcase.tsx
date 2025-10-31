@@ -76,6 +76,13 @@ export function PortfolioShowcase() {
           </p>
         </motion.div>
 
+        {/* Debug Info */}
+        {portfolio.length === 0 && (
+          <div className="text-center text-white mb-8 p-8 bg-red-900/20 border border-red-500 rounded-xl">
+            <p className="text-xl">⚠️ No portfolio items found!</p>
+          </div>
+        )}
+
         {/* Carousel Container */}
         <div className="relative max-w-6xl mx-auto mb-12">
           <div className="overflow-hidden" ref={emblaRef}>
