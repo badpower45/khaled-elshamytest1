@@ -70,7 +70,7 @@ const initialData: SiteData = {
       titleAr: 'Before - After',
       descriptionEn: 'Professional transformation showcase',
       descriptionAr: 'عرض التحول الاحترافي',
-      image: '',
+      image: 'https://i.vimeocdn.com/video/2068977244-cbdfd2508890a771868d81e77aa7cd40da9ac1c59eb100951fc90c8d4bd496b2-d_640x360.jpg',
       videoUrl: 'https://player.vimeo.com/video/1126504175?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -79,7 +79,7 @@ const initialData: SiteData = {
       titleAr: 'Get',
       descriptionEn: 'Creative content creation',
       descriptionAr: 'إنتاج محتوى إبداعي',
-      image: '',
+      image: 'https://i.vimeocdn.com/video/2068977257-e02d7b5a775d12d7efb96daa88d06f45a7c12dcdd9c7b39bb3e8fdbe0acf2ce5-d_640x360.jpg',
       videoUrl: 'https://player.vimeo.com/video/1126504193?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -88,7 +88,7 @@ const initialData: SiteData = {
       titleAr: 'إسمع للناجحين ، تنجح',
       descriptionEn: 'Motivational content',
       descriptionAr: 'محتوى تحفيزي',
-      image: '',
+      image: 'https://i.vimeocdn.com/video/2068977276-c7a0ffacb66f08fee1a4fc6a0a36edf4b0fc82c31bb6b58c76ebd7c10f8f8b85-d_640x360.jpg',
       videoUrl: 'https://player.vimeo.com/video/1126504203?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -97,7 +97,7 @@ const initialData: SiteData = {
       titleAr: 'اكتب SFX وهبعتهملك فى فايل',
       descriptionEn: 'Video editing tips',
       descriptionAr: 'نصائح مونتاج الفيديو',
-      image: '',
+      image: 'https://i.vimeocdn.com/video/2068977286-ad1cb3730aa7ba1c1d01ddb8f3ebf48d53bd3bef5f9e69e7eb651fbad47e3e6e-d_640x360.jpg',
       videoUrl: 'https://player.vimeo.com/video/1126504212?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -106,7 +106,7 @@ const initialData: SiteData = {
       titleAr: 'مهم جدا تعمل الاعدادات دى لكاميرا الايفون',
       descriptionEn: 'Essential iPhone camera tips',
       descriptionAr: 'نصائح أساسية لكاميرا الايفون',
-      image: '',
+      image: 'https://i.vimeocdn.com/video/2068977299-2c7c1c4c5b91c773e7d13b8af7fc5f2ced99c1e6ea5c98ab7dc1a16b23df75f9-d_640x360.jpg',
       videoUrl: 'https://player.vimeo.com/video/1126504229?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     }
   ],
@@ -193,10 +193,21 @@ const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => {
+    // Clear old localStorage data to force reload with new thumbnail URLs
     try {
       const raw = localStorage.getItem('siteData');
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SiteData>;
+        // Check if portfolio items have images - if not, clear localStorage
+        if (parsed.portfolio && parsed.portfolio.length > 0) {
+          const hasImages = parsed.portfolio.every((item: any) => item.image && item.image.trim() !== '');
+          if (!hasImages) {
+            console.log('Clearing old portfolio data without thumbnails...');
+            localStorage.removeItem('siteData');
+            return initialData;
+          }
+        }
+        
         // import deepMerge from above local helper if available; replicate minimal merge here
         function shallowMerge(base: any, ov: any) {
           if (!ov) return base;
@@ -271,7 +282,21 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
         }
         if (rows && rows.length && mounted) {
           const remote = rows[0].data as Partial<SiteData> | null;
-          if (remote) setData(deepMerge(initialData, remote) as SiteData);
+          if (remote) {
+            // Check if remote portfolio items have images
+            const hasImages = remote.portfolio && remote.portfolio.length > 0 
+              ? remote.portfolio.every((item: any) => item.image && item.image.trim() !== '')
+              : false;
+            
+            if (!hasImages && remote.portfolio && remote.portfolio.length > 0) {
+              console.log('Remote portfolio data missing thumbnails, updating Supabase...');
+              // Update Supabase with new data that has thumbnails
+              await supabase.from('site').upsert({ id: 1, data: initialData });
+              setData(initialData);
+            } else {
+              setData(deepMerge(initialData, remote) as SiteData);
+            }
+          }
         }
       } catch (err) {
         console.warn('Supabase fetch failed:', err);

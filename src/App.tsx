@@ -18,6 +18,17 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
 
   useEffect(() => {
+    // One-time cache clear for video thumbnails update (can be removed after user confirms fix)
+    const cacheCleared = sessionStorage.getItem('portfolioThumbnailsFixed');
+    if (!cacheCleared) {
+      console.log('Clearing old portfolio cache for thumbnail update...');
+      localStorage.removeItem('siteData');
+      sessionStorage.setItem('portfolioThumbnailsFixed', 'true');
+      console.log('Cache cleared! Videos will now display with thumbnails.');
+    }
+  }, []);
+
+  useEffect(() => {
     const base = '/khaled-elshamytest1';
     const isDev = import.meta.env.DEV;
     const getPath = () => {

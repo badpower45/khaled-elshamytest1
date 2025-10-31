@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Portfolio Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0A0A0A;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 2px solid #FFC107;
+        }
+        button {
+            background: #FFC107;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #FFD54F;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .success {
+            background: #4CAF50;
+            color: white;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: #FFC107;">🔄 Reset Portfolio Data</h1>
+        <p>Click the button below to clear cached data and reload with new video thumbnails</p>
+        <button onclick="resetData()">Reset & Reload</button>
+        <button onclick="window.location.href='/'">Go to Homepage</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function resetData() {
+            const status = document.getElementById('status');
+            try {
+                // Clear localStorage
+                localStorage.removeItem('siteData');
+                status.className = 'success';
+                status.textContent = '✓ Cache cleared successfully! Redirecting...';
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            } catch (error) {
+                status.className = 'error';
+                status.textContent = '✗ Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
