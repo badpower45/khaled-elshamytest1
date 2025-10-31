@@ -245,6 +245,14 @@ function VideoCard({ item, index, language, featured = false }: {
         className={`relative aspect-[9/16] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden ${featured ? 'shadow-2xl shadow-[#FFC107]/20 border-2 border-[#FFC107]/30' : 'border border-[#FFC107]/10'}`}
         transition={{ duration: 0.3 }}
       >
+        {item.image && (
+          <img 
+            src={item.image} 
+            alt={language === 'ar' ? item.titleAr : item.titleEn}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+        
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 193, 7, 0.3) 0%, transparent 50%)',

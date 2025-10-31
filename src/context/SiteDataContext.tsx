@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useRe
 import { supabase } from '../lib/supabase';
 import { SiteData } from '../types';
 import khaledImage from 'figma:asset/6f9a3b49d9d5a7cf854a44a26780766d0a9dba89.png';
+import { addVimeoThumbnailsToPortfolio } from '../lib/vimeoThumbnails';
 
 const initialData: SiteData = {
   personalInfo: {
@@ -280,6 +281,29 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     return () => { mounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const thumbnailsFetched = useRef(false);
+  
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (thumbnailsFetched.current) return;
+      
+      const portfolioNeedsThumbnails = data.portfolio.some(item => item.videoUrl && !item.image);
+      if (portfolioNeedsThumbnails) {
+        thumbnailsFetched.current = true;
+        const updatedPortfolio = await addVimeoThumbnailsToPortfolio(data.portfolio);
+        if (mounted) {
+          setData(prev => ({
+            ...prev,
+            portfolio: updatedPortfolio
+          }));
+        }
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [data.portfolio]);
 
   useEffect(() => {
     // debounce save
