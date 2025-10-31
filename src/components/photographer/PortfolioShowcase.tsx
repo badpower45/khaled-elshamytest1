@@ -87,13 +87,13 @@ export function PortfolioShowcase() {
                     key={item.id}
                     className={`flex-shrink-0 transition-all duration-500 ease-out ${
                       isCenter 
-                        ? 'w-[50%] sm:w-[45%] md:w-[40%] lg:w-[35%] px-2 sm:px-3' 
-                        : 'w-[35%] sm:w-[32%] md:w-[28%] lg:w-[25%] px-1.5 sm:px-2'
+                        ? 'w-[75%] sm:w-[65%] md:w-[55%] lg:w-[45%] px-3 sm:px-4' 
+                        : 'w-[55%] sm:w-[45%] md:w-[38%] lg:w-[32%] px-2 sm:px-3'
                     }`}
                     style={{
-                      opacity: isCenter ? 1 : 0.7,
-                      filter: isCenter ? 'blur(0px)' : 'blur(1px)',
-                      transform: isCenter ? 'scale(1)' : 'scale(0.92)',
+                      opacity: isCenter ? 1 : 0.75,
+                      filter: isCenter ? 'blur(0px)' : 'blur(0.5px)',
+                      transform: isCenter ? 'scale(1)' : 'scale(0.95)',
                     }}
                   >
                     <motion.div
