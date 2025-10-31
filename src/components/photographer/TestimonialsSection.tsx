@@ -5,7 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 export function TestimonialsSection() {
   const { data } = useSiteData();
-  const { testimonials, awards } = data;
+  const { testimonials } = data;
   const { language } = useLanguage();
 
   return (
@@ -131,58 +131,6 @@ export function TestimonialsSection() {
             </motion.div>
           ))}
         </div>
-
-        {/* Awards Section */}
-        <motion.div
-          className="mt-16 sm:mt-20"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl text-[#FFC107] mb-8 sm:mb-12 text-center font-['Playfair_Display'] italic">
-            {language === 'ar' ? 'الجوائز والتقديرات' : 'Awards & Recognition'}
-          </h3>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {awards.map((award, index) => (
-              <motion.div
-                key={award.id}
-                className="bg-gradient-to-br from-gray-900/40 to-gray-800/20 border border-[#FFC107]/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ 
-                  borderColor: 'rgba(255, 193, 7, 0.5)',
-                  scale: 1.02
-                }}
-              >
-                <div className="inline-block bg-[#FFC107]/10 rounded-full p-3 sm:p-4 mb-3 sm:mb-4">
-                  <Star className="w-6 h-6 sm:w-8 sm:h-8 text-[#FFC107]" fill="#FFC107" />
-                </div>
-                
-                <p className="text-xl sm:text-2xl text-[#FFC107] mb-2 font-['Playfair_Display']">
-                  {award.year}
-                </p>
-                
-                <h4 className="text-white mb-1 font-['Inter'] text-sm sm:text-base">
-                  {language === 'ar' ? award.titleAr : award.titleEn}
-                </h4>
-                
-                <p className="text-xs sm:text-sm text-gray-400 font-['Inter'] mb-2 sm:mb-3" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {award.organization}
-                </p>
-                
-                <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-[#FFC107]/20">
-                  <span className="text-xs text-gray-500 font-['Inter']">
-                    {award.category}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { motion } from 'motion/react';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useState } from 'react';
 import { X, Play, Instagram } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -21,7 +20,6 @@ export function PortfolioShowcase() {
 
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-32 bg-[#0A0A0A] relative overflow-hidden">
-      {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255, 193, 7, 0.3) 1px, transparent 0)',
@@ -45,124 +43,85 @@ export function PortfolioShowcase() {
           </p>
         </motion.div>
 
-        {/* Portrait Grid - Mobile-first Reels Style */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
-          {portfolio.map((item, index) => (
+        {/* Featured Video Layout - Large center + 2 sides */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto mb-12">
+          {/* Left Side Video - Hidden on mobile */}
+          {portfolio[1] && (
+            <motion.div
+              className="hidden lg:block w-64 xl:w-72 opacity-30 hover:opacity-70 transition-all duration-300 cursor-pointer"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 0.3, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              onClick={() => handleItemClick(portfolio[1])}
+            >
+              <VideoCard item={portfolio[1]} index={1} language={language} />
+            </motion.div>
+          )}
+
+          {/* Center Large Video */}
+          {portfolio[0] && (
+            <motion.div
+              className="w-full max-w-md lg:max-w-lg cursor-pointer"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              onClick={() => handleItemClick(portfolio[0])}
+            >
+              <VideoCard item={portfolio[0]} index={0} language={language} featured />
+            </motion.div>
+          )}
+
+          {/* Right Side Video - Hidden on mobile */}
+          {portfolio[2] && (
+            <motion.div
+              className="hidden lg:block w-64 xl:w-72 opacity-30 hover:opacity-70 transition-all duration-300 cursor-pointer"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 0.3, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              onClick={() => handleItemClick(portfolio[2])}
+            >
+              <VideoCard item={portfolio[2]} index={2} language={language} />
+            </motion.div>
+          )}
+        </div>
+
+        {/* Rest of portfolio on mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:hidden">
+          {portfolio.slice(1).map((item, index) => (
             <motion.div
               key={item.id}
-              className="group cursor-pointer"
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               onClick={() => handleItemClick(item)}
+              className="cursor-pointer"
             >
-              <div className="relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl">
-                {/* Portrait aspect ratio for Reels (9:16) */}
-                <motion.div
-                  className="relative aspect-[9/16] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Static Background - No Video Loading */}
-                  <div className="absolute inset-0">
-                    {/* Cinematic pattern */}
-                    <div className="absolute inset-0 opacity-10" style={{
-                      backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 193, 7, 0.3) 0%, transparent 50%)',
-                    }} />
-                    
-                    {/* Film grain effect */}
-                    <div className="absolute inset-0 opacity-5" style={{
-                      backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 193, 7, 0.1) 2px, rgba(255, 193, 7, 0.1) 4px)',
-                    }} />
-                  </div>
-                  
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                  
-                  {/* Video/Reel indicator */}
-                  {item.videoUrl && (
-                    <motion.div
-                      className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-[#FFC107]/95 backdrop-blur-sm rounded-full p-1.5 sm:p-2 md:p-2.5"
-                      whileHover={{ scale: 1.1 }}
-                      animate={{ 
-                        boxShadow: [
-                          '0 0 0 0 rgba(255, 193, 7, 0.7)',
-                          '0 0 0 10px rgba(255, 193, 7, 0)',
-                        ]
-                      }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <Play className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-black" fill="black" />
-                    </motion.div>
-                  )}
-
-                  {/* Instagram Reel badge */}
-                  <motion.div
-                    className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-md sm:rounded-lg px-1.5 sm:px-2 py-0.5 sm:py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    initial={{ x: -10 }}
-                    whileHover={{ x: 0 }}
-                  >
-                    <Instagram className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
-                    <span className="text-white text-[10px] sm:text-xs font-['Inter']">Reel</span>
-                  </motion.div>
-                  
-                  {/* Content overlay */}
-                  <motion.div
-                    className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4 text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-                    viewport={{ once: true }}
-                  >
-                    <div 
-                      className="space-y-0.5 sm:space-y-1 md:space-y-1.5"
-                      dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    >
-                      <p className="text-[#FFC107] uppercase tracking-wider font-['Inter'] text-[9px] sm:text-[10px] md:text-xs">
-                        {language === 'ar' ? 'ريل' : 'REEL'}
-                      </p>
-                      
-                      <h3 
-                        className="text-xs sm:text-sm md:text-base lg:text-lg font-['Playfair_Display'] italic leading-tight line-clamp-2"
-                        style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
-                      >
-                        {language === 'ar' ? item.titleAr : item.titleEn}
-                      </h3>
-                      
-                      <p 
-                        className="text-gray-300 text-[10px] sm:text-xs md:text-sm font-['Inter'] line-clamp-1 sm:line-clamp-2 leading-snug"
-                        style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
-                      >
-                        {language === 'ar' ? item.descriptionAr : item.descriptionEn}
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {/* Hover border effect */}
-                  <motion.div
-                    className="absolute inset-0 border-2 border-[#FFC107] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg sm:rounded-xl md:rounded-2xl"
-                    initial={{ scale: 0.95 }}
-                    whileHover={{ scale: 1 }}
-                  />
-
-                  {/* Play button overlay on hover */}
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    initial={{ scale: 0.8 }}
-                    whileHover={{ scale: 1 }}
-                  >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-[#FFC107]/90 rounded-full flex items-center justify-center backdrop-blur-sm">
-                      <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-black ml-0.5 sm:ml-1" fill="black" />
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </div>
+              <VideoCard item={item} index={index + 1} language={language} small />
             </motion.div>
           ))}
         </div>
 
-        {/* View More Button */}
+        {/* All videos grid on desktop */}
+        <div className="hidden lg:grid grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mt-12">
+          {portfolio.slice(3).map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              onClick={() => handleItemClick(item)}
+              className="cursor-pointer"
+            >
+              <VideoCard item={item} index={index + 3} language={language} small />
+            </motion.div>
+          ))}
+        </div>
+
         <motion.div
           className="text-center mt-12 sm:mt-16"
           initial={{ opacity: 0, y: 30 }}
@@ -184,7 +143,7 @@ export function PortfolioShowcase() {
         </motion.div>
       </div>
 
-      {/* Lightbox Modal - Portrait Video Player */}
+      {/* Lightbox Modal */}
       {selectedItem && (
         <motion.div
           className="fixed inset-0 bg-black/98 z-50 flex items-center justify-center p-4"
@@ -244,5 +203,106 @@ export function PortfolioShowcase() {
         </motion.div>
       )}
     </section>
+  );
+}
+
+function VideoCard({ item, index, language, featured = false, small = false }: { 
+  item: any; 
+  index: number; 
+  language: 'ar' | 'en';
+  featured?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl">
+      <motion.div
+        className={`relative aspect-[9/16] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden ${featured ? 'shadow-2xl shadow-[#FFC107]/20' : ''}`}
+        whileHover={{ scale: featured ? 1.03 : 1.02 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 193, 7, 0.3) 0%, transparent 50%)',
+          }} />
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 193, 7, 0.1) 2px, rgba(255, 193, 7, 0.1) 4px)',
+          }} />
+        </div>
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+        
+        {item.videoUrl && (
+          <motion.div
+            className={`absolute ${small ? 'top-1.5 right-1.5' : 'top-2 sm:top-3 right-2 sm:right-3'} bg-[#FFC107]/95 backdrop-blur-sm rounded-full ${small ? 'p-1' : 'p-1.5 sm:p-2 md:p-2.5'}`}
+            whileHover={{ scale: 1.1 }}
+            animate={{ 
+              boxShadow: [
+                '0 0 0 0 rgba(255, 193, 7, 0.7)',
+                '0 0 0 10px rgba(255, 193, 7, 0)',
+              ]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <Play className={`${small ? 'w-2.5 h-2.5' : 'w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5'} text-black`} fill="black" />
+          </motion.div>
+        )}
+
+        <motion.div
+          className={`absolute ${small ? 'top-1.5 left-1.5 px-1 py-0.5' : 'top-2 sm:top-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1'} bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-md flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}
+        >
+          <Instagram className={`${small ? 'w-2 h-2' : 'w-2.5 h-2.5 sm:w-3 sm:h-3'} text-white`} />
+          <span className={`text-white ${small ? 'text-[8px]' : 'text-[10px] sm:text-xs'} font-['Inter']`}>Reel</span>
+        </motion.div>
+        
+        <motion.div
+          className={`absolute bottom-0 left-0 right-0 ${small ? 'p-1.5' : featured ? 'p-4 sm:p-6' : 'p-2 sm:p-3 md:p-4'} text-white`}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
+          viewport={{ once: true }}
+        >
+          <div 
+            className={`${small ? 'space-y-0.5' : 'space-y-1 sm:space-y-2'}`}
+            dir={language === 'ar' ? 'rtl' : 'ltr'}
+          >
+            <p className={`text-[#FFC107] uppercase tracking-wider font-['Inter'] ${small ? 'text-[8px]' : featured ? 'text-xs sm:text-sm' : 'text-[9px] sm:text-[10px] md:text-xs'}`}>
+              {language === 'ar' ? 'ريل' : 'REEL'}
+            </p>
+            
+            <h3 
+              className={`font-['Playfair_Display'] italic leading-tight ${small ? 'text-[10px] line-clamp-1' : featured ? 'text-base sm:text-lg md:text-xl line-clamp-2' : 'text-xs sm:text-sm md:text-base line-clamp-2'}`}
+              style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
+            >
+              {language === 'ar' ? item.titleAr : item.titleEn}
+            </h3>
+            
+            {!small && (
+              <p 
+                className={`text-gray-300 font-['Inter'] line-clamp-2 leading-snug ${featured ? 'text-xs sm:text-sm md:text-base' : 'text-[10px] sm:text-xs'}`}
+                style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
+              >
+                {language === 'ar' ? item.descriptionAr : item.descriptionEn}
+              </p>
+            )}
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`absolute inset-0 border-2 border-[#FFC107] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${small ? 'rounded-lg' : 'rounded-lg sm:rounded-xl md:rounded-2xl'}`}
+          initial={{ scale: 0.95 }}
+          whileHover={{ scale: 1 }}
+        />
+
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          initial={{ scale: 0.8 }}
+          whileHover={{ scale: 1 }}
+        >
+          <div className={`${small ? 'w-8 h-8' : featured ? 'w-16 h-16 lg:w-20 lg:h-20' : 'w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14'} bg-[#FFC107]/90 rounded-full flex items-center justify-center backdrop-blur-sm`}>
+            <Play className={`${small ? 'w-4 h-4' : featured ? 'w-8 h-8 lg:w-10 lg:h-10' : 'w-5 h-5 sm:w-6 sm:h-6'} text-black ml-0.5`} fill="black" />
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
