@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
@@ -48,37 +48,6 @@ export function AdminPanel() {
       toast.error('Load error: ' + String(err?.message || err));
     }
   };
-
-  // Supabase contact save
-  // Auto-save contact info to Supabase
-  const autoSaveContact = async (partial: any) => {
-    // Update local state
-    updateContactInfo(partial);
-    // Save to Supabase
-    const contact = {
-      ...data.contactInfo,
-      ...partial,
-      studio_address: partial.studioAddress ?? data.contactInfo.studioAddress,
-      weekdays: partial.workingHours?.weekdays ?? data.contactInfo.workingHours.weekdays,
-      friday: partial.workingHours?.friday ?? data.contactInfo.workingHours.friday,
-      emergency: partial.workingHours?.emergency ?? data.contactInfo.workingHours.emergency,
-      created_at: new Date().toISOString(),
-    };
-    const { error } = await supabase.from('contacts').insert([contact]);
-    if (error) toast.error('خطأ في الحفظ: ' + error.message);
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from('contacts').select('*');
-      if (error) {
-        console.error('Error fetching data:', error.message);
-      } else {
-        updateContactInfo(data[0]); // تحديث البيانات في الحالة المحلية
-      }
-    };
-    fetchData();
-  }, []);
 
   if (!isAuthenticated) {
     return <Login onSuccess={() => setIsAuthenticated(true)} />;
@@ -614,7 +583,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">البريد الإلكتروني</label>
                   <Input
                     value={data.contactInfo.email}
-                    onChange={(e) => autoSaveContact({ email: e.target.value })}
+                    onChange={(e) => updateContactInfo({ email: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                     type="email"
                   />
@@ -624,7 +593,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">الهاتف</label>
                   <Input
                     value={data.contactInfo.phone}
-                    onChange={(e) => autoSaveContact({ phone: e.target.value })}
+                    onChange={(e) => updateContactInfo({ phone: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white"
                   />
                 </div>
@@ -633,7 +602,7 @@ export function AdminPanel() {
                   <label className="block text-white mb-2 text-right font-['Inter']">عنوان الاستوديو</label>
                   <Input
                     value={data.contactInfo.studioAddress}
-                    onChange={(e) => autoSaveContact({ studioAddress: e.target.value })}
+                    onChange={(e) => updateContactInfo({ studioAddress: e.target.value })}
                     className="bg-gray-800 border-gray-700 text-white text-right"
                     dir="rtl"
                   />
@@ -646,7 +615,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">أيام الأسبوع</label>
                       <Input
                         value={data.contactInfo.workingHours.weekdays}
-                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, weekdays: e.target.value } })}
+                        onChange={(e) => updateContactInfo({ workingHours: { ...data.contactInfo.workingHours, weekdays: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
@@ -656,7 +625,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">الجمعة</label>
                       <Input
                         value={data.contactInfo.workingHours.friday}
-                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, friday: e.target.value } })}
+                        onChange={(e) => updateContactInfo({ workingHours: { ...data.contactInfo.workingHours, friday: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
@@ -666,7 +635,7 @@ export function AdminPanel() {
                       <label className="block text-white mb-2 text-right font-['Inter'] text-sm">الطوارئ</label>
                       <Input
                         value={data.contactInfo.workingHours.emergency}
-                        onChange={(e) => autoSaveContact({ workingHours: { ...data.contactInfo.workingHours, emergency: e.target.value } })}
+                        onChange={(e) => updateContactInfo({ workingHours: { ...data.contactInfo.workingHours, emergency: e.target.value } })}
                         className="bg-gray-800 border-gray-700 text-white text-right"
                         dir="rtl"
                       />
