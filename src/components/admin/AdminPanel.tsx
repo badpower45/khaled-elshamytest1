@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { motion } from 'motion/react';
-import { ArrowLeft, User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
+import { User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { ImageUploadField } from './ImageUploadField';
 import { Button } from '../ui/button';
