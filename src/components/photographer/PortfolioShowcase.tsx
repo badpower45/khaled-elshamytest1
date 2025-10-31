@@ -13,7 +13,10 @@ export function PortfolioShowcase() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
     align: 'center',
-    containScroll: 'trimSnaps'
+    containScroll: 'trimSnaps',
+    skipSnaps: false,
+    dragFree: false,
+    duration: 25
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -82,22 +85,22 @@ export function PortfolioShowcase() {
                 return (
                   <div
                     key={item.id}
-                    className={`flex-shrink-0 transition-all duration-500 ${
+                    className={`flex-shrink-0 transition-all duration-500 ease-out ${
                       isCenter 
-                        ? 'w-full sm:w-[70%] md:w-[60%] lg:w-[50%] px-2 sm:px-4' 
-                        : 'w-[45%] sm:w-[35%] md:w-[30%] lg:w-[25%] px-1 sm:px-2'
+                        ? 'w-[50%] sm:w-[45%] md:w-[40%] lg:w-[35%] px-2 sm:px-3' 
+                        : 'w-[35%] sm:w-[32%] md:w-[28%] lg:w-[25%] px-1.5 sm:px-2'
                     }`}
                     style={{
-                      opacity: isCenter ? 1 : 0.4,
-                      filter: isCenter ? 'blur(0px)' : 'blur(4px)',
-                      transform: isCenter ? 'scale(1)' : 'scale(0.85)',
+                      opacity: isCenter ? 1 : 0.7,
+                      filter: isCenter ? 'blur(0px)' : 'blur(1px)',
+                      transform: isCenter ? 'scale(1)' : 'scale(0.92)',
                     }}
                   >
                     <motion.div
                       className="cursor-pointer"
                       onClick={() => handleItemClick(item)}
-                      whileHover={{ scale: isCenter ? 1.02 : 0.87 }}
-                      transition={{ duration: 0.3 }}
+                      whileHover={{ scale: isCenter ? 1.02 : 0.94 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
                     >
                       <VideoCard 
                         item={item} 
