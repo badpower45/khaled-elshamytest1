@@ -4,6 +4,9 @@ import { Camera, Aperture } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';
 import heroImage from '@/assets/hero-image.jpg';
+import bg1 from '@/assets/bg1.jpg';
+import bg2 from '@/assets/bg2.jpg';
+import bg3 from '@/assets/bg3.jpg';
 
 export function HeroSection() {
   const { data } = useSiteData();
@@ -17,9 +20,9 @@ export function HeroSection() {
         className="absolute inset-0 opacity-30"
         animate={{
           backgroundImage: [
-            'url("https://images.unsplash.com/photo-1732965757891-368c1f235e7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMHBob3RvZ3JhcGh5JTIwYmVhdXRpZnVsfGVufDF8fHx8MTc1ODU3NjI0M3ww&ixlib=rb-4.1.0&q=80&w=1080")',
-            'url("https://images.unsplash.com/photo-1690626826523-a3224f48eb15?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnRpc3RpYyUyMGxhbmRzY2FwZSUyMHBob3RvZ3JhcGh5JTIwc3R1bm5pbmd8ZW58MXx8fHwxNzU4NTc2MjQ2fDA&ixlib=rb-4.1.0&q=80&w=1080")',
-            'url("https://images.unsplash.com/photo-1680511352929-f36478d2e424?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwcGhvdG9ncmFwaHklMjBtb2RlbCUyMHN0dWRpb3xlbnwxfHx8fDE3NTg1NzYyNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080")',
+            `url(${bg1})`,
+            `url(${bg2})`,
+            `url(${bg3})`,
           ],
         }}
         transition={{
@@ -87,7 +90,7 @@ export function HeroSection() {
                     textShadow: '0 0 30px rgba(255, 193, 7, 0.5)',
                   }}
                 >
-                  {personalInfo.nameEn.split(' ')[0]}
+                  {personalInfo.nameEn.split(' ').slice(0, 2).join(' ')}
                 </motion.span>
                 <br />
                 <motion.span
@@ -98,7 +101,7 @@ export function HeroSection() {
                     textShadow: '0 0 30px rgba(255, 193, 7, 0.5)',
                   }}
                 >
-                  {personalInfo.nameEn.split(' ')[1]}
+                  {personalInfo.nameEn.split(' ').slice(2).join(' ')}
                 </motion.span>
               </>
             )}
