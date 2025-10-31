@@ -10,6 +10,7 @@ export function PortfolioShowcase() {
   const { portfolio } = data;
   const { language } = useLanguage();
   const [selectedItem, setSelectedItem] = useState<typeof portfolio[0] | null>(null);
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
     align: 'center',
@@ -250,6 +251,8 @@ function VideoCard({ item, index, language, featured = false }: {
             src={item.image} 
             alt={language === 'ar' ? item.titleAr : item.titleEn}
             className="absolute inset-0 w-full h-full object-cover"
+            onError={() => {}}
+            loading="lazy"
           />
         )}
         
