@@ -55,15 +55,33 @@ export function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
-      {/* Removed Header */}
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <h1 className="text-white text-2xl">Welcome to Admin Panel</h1>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-1 sm:gap-2 bg-gray-900/50 p-1 sm:p-2 rounded-xl mb-6 sm:mb-8 overflow-x-auto">
-            <div className="col-span-full flex justify-end gap-2 p-2">
-              <Button onClick={saveToCloud} className="bg-[#10B981]">حفظ على السحابة</Button>
-              <Button onClick={loadFromCloud} className="bg-[#3B82F6]">تحميل من السحابة</Button>
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <h1 className="text-3xl sm:text-4xl text-[#FFC107] font-['Playfair_Display'] italic" dir="rtl">
+              لوحة التحكم
+            </h1>
+            <div className="flex gap-3">
+              <Button 
+                onClick={loadFromCloud} 
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white border-0 shadow-lg"
+              >
+                <span className="mr-2">📥</span>
+                تحميل من السحابة
+              </Button>
+              <Button 
+                onClick={saveToCloud} 
+                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white border-0 shadow-lg"
+              >
+                <span className="mr-2">💾</span>
+                حفظ على السحابة
+              </Button>
             </div>
+          </div>
+        </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-2 bg-gray-900/70 p-2 rounded-xl mb-8 border border-[#FFC107]/10" dir="rtl">
             <TabsTrigger value="personal" className="data-[state=active]:bg-[#FFC107] data-[state=active]:text-black text-xs sm:text-sm whitespace-nowrap">
               <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">المعلومات</span>

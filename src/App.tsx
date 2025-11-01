@@ -16,13 +16,13 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'admin'>('home');
 
   useEffect(() => {
-    // One-time cache clear for video thumbnails update (can be removed after user confirms fix)
-    const cacheCleared = sessionStorage.getItem('portfolioThumbnailsFixed');
+    // One-time cache clear for portfolio thumbnails - uses localStorage to persist across sessions
+    const cacheCleared = localStorage.getItem('portfolioThumbnails_v3_cleared');
     if (!cacheCleared) {
-      console.log('Clearing old portfolio cache for thumbnail update...');
+      console.log('🔄 One-time cache update for portfolio thumbnails...');
       localStorage.removeItem('siteData');
-      sessionStorage.setItem('portfolioThumbnailsFixed', 'true');
-      console.log('Cache cleared! Videos will now display with thumbnails.');
+      localStorage.setItem('portfolioThumbnails_v3_cleared', 'true');
+      console.log('✅ Cache updated! Portfolio data will reload fresh.');
     }
   }, []);
 
