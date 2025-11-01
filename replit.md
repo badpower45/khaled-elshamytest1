@@ -14,6 +14,12 @@ Professional photographer portfolio website built with React, TypeScript, Vite, 
 
 ## Recent Changes
 **November 1, 2025 - Latest Update**
+- ✅ **Portfolio Grid Layout**: Removed carousel, videos now display side by side
+  - Changed from carousel (embla-carousel) to responsive grid layout
+  - Videos display in 2-5 columns depending on screen size (2 on mobile, 5 on desktop)
+  - Maintained all interactive features: click to view, lightbox modal, thumbnails
+  - Improved performance by removing carousel library dependency
+  
 - ✅ **Complete Replit Import & Setup**: Successfully completed full project migration
   - Installed all npm dependencies (201 packages)
   - Fixed Vite configuration for Replit proxy compatibility
@@ -21,9 +27,9 @@ Professional photographer portfolio website built with React, TypeScript, Vite, 
   - Enabled automatic Vimeo thumbnail fetching in SiteDataContext
   - Project is fully operational with all features working
   
-- ✅ **Portfolio Video System**: 5 Vimeo videos in carousel display
+- ✅ **Portfolio Video System**: 5 Vimeo videos in grid display
   - Auto-fetches thumbnails from Vimeo oEmbed API on page load
-  - Responsive Instagram Reels-style carousel with center focus
+  - Responsive grid layout with videos displayed side by side
   - Click to play in fullscreen lightbox modal
   - All videos editable via admin panel at `/admin`
   
@@ -67,7 +73,7 @@ src/
 - **Automatic Vimeo Thumbnail Fetching**: Portfolio videos automatically fetch thumbnails from Vimeo
 - Responsive design (mobile-first)
 - Animated hero section with rotating backgrounds
-- Portfolio showcase with video carousel (Instagram Reels style)
+- Portfolio showcase with responsive grid layout (Instagram Reels style)
 - Contact form with Supabase integration
 - Dark theme with gold accents (#FFC107)
 - Video lightbox modal for fullscreen playback
@@ -75,7 +81,8 @@ src/
 ## Portfolio Videos
 The portfolio section displays Vimeo videos with the following features:
 - **Automatic Thumbnails**: When a portfolio item has a `videoUrl` but no `image`, the system automatically fetches the thumbnail from Vimeo using the oEmbed API
-- **Carousel Display**: Videos are shown in a responsive carousel with featured center item
+- **Grid Display**: Videos are shown in a responsive grid layout (2 columns on mobile, 3 on tablet, 4 on desktop, 5 on large screens)
+- **Side by Side**: All videos are displayed together, making it easy to browse the entire portfolio at once
 - **Click to Play**: Clicking a video opens a lightbox modal with fullscreen iframe player
 - **Admin Editable**: All video URLs, titles, and descriptions can be edited via the admin panel
 
