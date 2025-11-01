@@ -115,7 +115,7 @@ export function AdminPanel() {
 
           {/* Personal Info Tab */}
           <TabsContent value="personal">
-            <Card className="bg-gray-900/50 border-[#FFC107]/20 p-8">
+            <Card className="bg-gray-700/95 border-[#FFC107]/40 p-8">
               <h2 className="text-2xl text-[#FFC107] mb-6 font-['Playfair_Display'] text-right">
                 المعلومات الشخصية
               </h2>
@@ -258,7 +258,7 @@ export function AdminPanel() {
           <TabsContent value="services">
             <div className="space-y-6">
               {data.services.map((service, index) => (
-                <Card key={service.id} className="bg-gray-900/50 border-[#FFC107]/20 p-6">
+                <Card key={service.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
                   <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
                     خدمة {index + 1}
                   </h3>
@@ -365,7 +365,7 @@ export function AdminPanel() {
               </Card>
 
               {data.portfolio.map((item, index) => (
-                <Card key={item.id} className="bg-gray-900/50 border-[#FFC107]/20 p-6">
+                <Card key={item.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
                   <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
                     عمل {index + 1}
                   </h3>
@@ -456,7 +456,7 @@ export function AdminPanel() {
           <TabsContent value="testimonials">
             <div className="space-y-6">
               {data.testimonials.map((testimonial, index) => (
-                <Card key={testimonial.id} className="bg-gray-900/50 border-[#FFC107]/20 p-6">
+                <Card key={testimonial.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
                   <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
                     شهادة {index + 1}
                   </h3>
@@ -521,7 +521,7 @@ export function AdminPanel() {
           <TabsContent value="awards">
             <div className="space-y-6">
               {data.awards.map((award, index) => (
-                <Card key={award.id} className="bg-gray-900/50 border-[#FFC107]/20 p-6">
+                <Card key={award.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
                   <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
                     جائزة {index + 1}
                   </h3>
@@ -591,7 +591,7 @@ export function AdminPanel() {
 
           {/* Contact Tab */}
           <TabsContent value="contact">
-            <Card className="bg-gray-900/50 border-[#FFC107]/20 p-8">
+            <Card className="bg-gray-700/95 border-[#FFC107]/40 p-8">
               <h2 className="text-2xl text-[#FFC107] mb-6 font-['Playfair_Display'] text-right">
                 معلومات التواصل
               </h2>
@@ -668,7 +668,7 @@ export function AdminPanel() {
 
           {/* Social Media Tab */}
           <TabsContent value="social">
-            <Card className="bg-gray-900/50 border-[#FFC107]/20 p-8">
+            <Card className="bg-gray-700/95 border-[#FFC107]/40 p-8">
               <h2 className="text-2xl text-[#FFC107] mb-6 font-['Playfair_Display'] text-right">
                 حسابات التواصل الاجتماعي
               </h2>
