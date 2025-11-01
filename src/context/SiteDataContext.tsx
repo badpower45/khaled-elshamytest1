@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useRe
 import { supabase } from '../lib/supabase';
 import { SiteData } from '../types';
 import khaledImage from 'figma:asset/6f9a3b49d9d5a7cf854a44a26780766d0a9dba89.png';
-import { addVimeoThumbnailsToPortfolio } from '../lib/vimeoThumbnails';
 
 const initialData: SiteData = {
   personalInfo: {
@@ -193,23 +192,18 @@ const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => {
-    // Clear old localStorage data to force reload with new thumbnail URLs
+    // Clear localStorage to remove old image URLs
     try {
       const raw = localStorage.getItem('siteData');
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SiteData>;
-        // Check if portfolio items have images - if not, or if they have old Vimeo CDN URLs, clear localStorage
+        // Clear cache if portfolio has any image URLs (we want empty images only)
         if (parsed.portfolio && parsed.portfolio.length > 0) {
-          const hasValidImages = parsed.portfolio.every((item: any) => {
-            if (!item.image || item.image.trim() === '') return false;
-            // Clear cache if using old direct Vimeo CDN URLs (which may be expired)
-            if (item.image.includes('i.vimeocdn.com/video/')) return false;
-            return true;
-          });
-          if (!hasValidImages) {
-            console.log('🔄 One-time cache update for portfolio thumbnails...');
+          const hasAnyImages = parsed.portfolio.some((item: any) => item.image && item.image.trim() !== '');
+          if (hasAnyImages) {
+            console.log('🔄 Clearing old portfolio images...');
             localStorage.removeItem('siteData');
-            console.log('✅ Cache updated! Portfolio data will reload fresh.');
+            console.log('✅ Portfolio will show with dark backgrounds only.');
             return initialData;
           }
         }
@@ -316,38 +310,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const thumbnailsFetched = useRef(false);
-  
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const portfolioNeedsThumbnails = data.portfolio.some(item => item.videoUrl && !item.image);
-      
-      // Only skip if we already tried AND all items now have images
-      if (thumbnailsFetched.current && !portfolioNeedsThumbnails) return;
-      
-      if (portfolioNeedsThumbnails) {
-        console.log('🎬 Fetching Vimeo thumbnails...');
-        const updatedPortfolio = await addVimeoThumbnailsToPortfolio(data.portfolio);
-        thumbnailsFetched.current = true;
-        
-        if (mounted) {
-          const hasNewImages = updatedPortfolio.some(item => item.image && item.image.trim() !== '');
-          if (hasNewImages) {
-            console.log('✅ Thumbnails fetched successfully!');
-            setData(prev => ({
-              ...prev,
-              portfolio: updatedPortfolio
-            }));
-          } else {
-            console.warn('⚠️ Failed to fetch thumbnails from Vimeo API');
-          }
-        }
-      }
-    })();
-
-    return () => { mounted = false; };
-  }, [data.portfolio]);
+  // Auto-fetch thumbnails disabled - videos will show with dark background only
 
   useEffect(() => {
     // debounce save
