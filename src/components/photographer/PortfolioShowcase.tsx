@@ -50,7 +50,7 @@ export function PortfolioShowcase() {
         )}
 
         {portfolio.length > 0 && (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 max-w-7xl mx-auto mb-12">
+          <div className="grid gap-1.5 sm:gap-2 max-w-7xl mx-auto mb-12" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 120px))', justifyContent: 'center' }}>
             {portfolio.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -60,7 +60,7 @@ export function PortfolioShowcase() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.03 }}
+                whileHover={{ scale: 1.05 }}
               >
                 <VideoCard 
                   item={item} 
