@@ -8,37 +8,51 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// NOTE: For simplicity this uses a hardcoded password. Assumption: this project
-// needs a simple client-side gate for the admin panel. Change this to real
-// server-side auth for production.
-const HARDCODED_PASSWORD = 'admin123';
+// Load admin password from environment variables
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+
+if (!ADMIN_PASSWORD) {
+  console.error('VITE_ADMIN_PASSWORD is not set in Replit Secrets. Admin login will not work.');
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('isAuthenticated') === '1';
+      const authData = localStorage.getItem('adminAuth');
+      if (!authData) return false;
+      
+      const { timestamp } = JSON.parse(authData);
+      const oneHour = 60 * 60 * 1000;
+      
+      // Session expires after 1 hour
+      if (Date.now() - timestamp > oneHour) {
+        localStorage.removeItem('adminAuth');
+        return false;
+      }
+      
+      return true;
     } catch (e) {
       return false;
     }
   });
 
   useEffect(() => {
-    // Automatically authenticate for admin panel
-    if (window.location.pathname.includes('/admin')) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  useEffect(() => {
     try {
-      if (isAuthenticated) localStorage.setItem('isAuthenticated', '1');
-      else localStorage.removeItem('isAuthenticated');
+      if (isAuthenticated) {
+        localStorage.setItem('adminAuth', JSON.stringify({ timestamp: Date.now() }));
+      } else {
+        localStorage.removeItem('adminAuth');
+      }
     } catch (e) {}
   }, [isAuthenticated]);
 
   const login = async (password: string) => {
-    // simple check — replace with API call if needed
-    const ok = password === HARDCODED_PASSWORD;
+    if (!ADMIN_PASSWORD) {
+      console.error('Admin password not configured');
+      return false;
+    }
+    
+    const ok = password === ADMIN_PASSWORD;
     setIsAuthenticated(ok);
     return ok;
   };
