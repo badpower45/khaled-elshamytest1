@@ -13,11 +13,13 @@ Professional photographer portfolio website built with React, TypeScript, Vite, 
 - **Default Language**: English (switchable to Arabic)
 
 ## Recent Changes
-**October 31, 2025**
-- ✅ **Project Migration**: Successfully migrated project to Replit environment
+**November 1, 2025**
+- ✅ **Complete Replit Setup**: Successfully completed project migration to Replit
   - Installed all npm dependencies (201 packages)
   - Configured dev server for port 5000 with host 0.0.0.0
-  - Verified Supabase connection and credentials
+  - Added Supabase credentials to Replit Secrets for secure storage
+  - Fixed LSP errors in App.tsx (removed unused imports)
+  - Project is fully operational and ready for use
 - ✅ **Video Display Fix**: Fixed portfolio video thumbnails not showing
   - Added automatic Vimeo thumbnail fetching using Vimeo oEmbed API
   - Created `src/lib/vimeoThumbnails.ts` utility for thumbnail extraction
@@ -73,7 +75,7 @@ The portfolio section displays Vimeo videos with the following features:
 - **Admin Editable**: All video URLs, titles, and descriptions can be edited via the admin panel
 
 ### How to Add Videos:
-1. Go to `/admin` and login
+1. Go to `/admin` and login with password: `admin123`
 2. Navigate to "معرض" (Portfolio) tab
 3. For each video, add:
    - Video URL: Use Vimeo embed URL (e.g., `https://player.vimeo.com/video/1126504175?...`)
@@ -84,9 +86,11 @@ The portfolio section displays Vimeo videos with the following features:
 5. Thumbnails will be automatically fetched from Vimeo if not provided
 
 ## Environment Variables
-The project uses Supabase with the following environment variables (optional, has fallbacks):
-- `VITE_SUPABASE_URL` - Supabase project URL
+The project uses Supabase with the following environment variables stored securely in Replit Secrets:
+- `VITE_SUPABASE_URL` - Supabase project URL (https://kbjdmogbswqsjzxldbka.supabase.co)
 - `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
+
+These credentials are now stored in Replit Secrets for security and will be used automatically by the application.
 
 ## Development
 - Server runs on port 5000
