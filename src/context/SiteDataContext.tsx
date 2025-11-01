@@ -310,7 +310,52 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-fetch thumbnails disabled - videos will show with dark background only
+  // Auto-fetch thumbnails for portfolio videos
+  useEffect(() => {
+    let mounted = true;
+    
+    const fetchThumbnails = async () => {
+      const hasEmptyThumbnails = data.portfolio.some(item => !item.image || item.image.trim() === '');
+      
+      if (hasEmptyThumbnails) {
+        try {
+          const updatedPortfolio = await Promise.all(
+            data.portfolio.map(async (item) => {
+              if (item.videoUrl && (!item.image || item.image.trim() === '')) {
+                const videoIdMatch = item.videoUrl.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
+                if (videoIdMatch) {
+                  const videoId = videoIdMatch[1];
+                  try {
+                    const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}`);
+                    if (response.ok) {
+                      const oembedData = await response.json();
+                      const thumbnail = oembedData.thumbnail_url?.replace('_200x150', '_640x360');
+                      if (thumbnail) {
+                        return { ...item, image: thumbnail };
+                      }
+                    }
+                  } catch (err) {
+                    console.warn('Failed to fetch thumbnail for video:', videoId);
+                  }
+                }
+              }
+              return item;
+            })
+          );
+          
+          if (mounted) {
+            setData(prev => ({ ...prev, portfolio: updatedPortfolio }));
+          }
+        } catch (err) {
+          console.warn('Error fetching Vimeo thumbnails:', err);
+        }
+      }
+    };
+    
+    fetchThumbnails();
+    
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     // debounce save
