@@ -99,10 +99,15 @@ The portfolio section displays Vimeo videos with the following features:
 
 ## Environment Variables
 The project uses Supabase with the following environment variables stored securely in Replit Secrets:
-- `VITE_SUPABASE_URL` - Supabase project URL (https://kbjdmogbswqsjzxldbka.supabase.co)
-- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `VITE_SUPABASE_URL` - Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key (public key)
+- `VITE_ADMIN_PASSWORD` - Admin panel password
 
-These credentials are now stored in Replit Secrets for security and will be used automatically by the application.
+**Security Notes:**
+- All credentials are stored in Replit Secrets (not in code)
+- Admin password is client-side only (cosmetic protection)
+- **IMPORTANT:** Must enable Row Level Security (RLS) in Supabase - see SUPABASE_SECURITY_SETUP.md
+- Without RLS, anyone with the anon key can modify data
 
 ## Development
 - Server runs on port 5000
