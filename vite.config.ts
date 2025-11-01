@@ -61,6 +61,7 @@ import { defineConfig } from 'vite';
       hmr: {
         clientPort: 5000,
       },
+      allowedHosts: true,
     },
     preview: {
       host: '0.0.0.0',

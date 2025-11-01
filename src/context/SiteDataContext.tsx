@@ -311,13 +311,21 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Auto-fetch thumbnails for portfolio videos
+  const thumbnailsFetched = useRef(false);
+  
   useEffect(() => {
+    if (thumbnailsFetched.current) return;
+    if (!data.portfolio || data.portfolio.length === 0) return;
+    
     let mounted = true;
     
     const fetchThumbnails = async () => {
       const hasEmptyThumbnails = data.portfolio.some(item => !item.image || item.image.trim() === '');
       
       if (hasEmptyThumbnails) {
+        console.log('🔍 Fetching Vimeo thumbnails for', data.portfolio.length, 'videos...');
+        thumbnailsFetched.current = true;
+        
         try {
           const updatedPortfolio = await Promise.all(
             data.portfolio.map(async (item) => {
@@ -331,6 +339,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
                       const oembedData = await response.json();
                       const thumbnail = oembedData.thumbnail_url?.replace('_200x150', '_640x360');
                       if (thumbnail) {
+                        console.log('✅ Fetched thumbnail for video:', videoId);
                         return { ...item, image: thumbnail };
                       }
                     }
@@ -344,6 +353,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
           );
           
           if (mounted) {
+            console.log('✅ Updated portfolio with', updatedPortfolio.length, 'videos');
             setData(prev => ({ ...prev, portfolio: updatedPortfolio }));
           }
         } catch (err) {
@@ -355,7 +365,8 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     fetchThumbnails();
     
     return () => { mounted = false; };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.portfolio.length]);
 
   useEffect(() => {
     // debounce save
