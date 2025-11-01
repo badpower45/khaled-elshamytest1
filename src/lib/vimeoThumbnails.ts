@@ -1,6 +1,7 @@
 export async function getVimeoThumbnail(videoUrl: string): Promise<string | null> {
   try {
-    const videoIdMatch = videoUrl.match(/vimeo\.com\/video\/(\d+)/);
+    // Match both player.vimeo.com and vimeo.com URLs
+    const videoIdMatch = videoUrl.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
     if (!videoIdMatch) return null;
     
     const videoId = videoIdMatch[1];

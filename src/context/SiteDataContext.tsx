@@ -70,7 +70,7 @@ const initialData: SiteData = {
       titleAr: 'Before - After',
       descriptionEn: 'Professional transformation showcase',
       descriptionAr: 'عرض التحول الاحترافي',
-      image: 'https://i.vimeocdn.com/video/2068977244-cbdfd2508890a771868d81e77aa7cd40da9ac1c59eb100951fc90c8d4bd496b2-d_640x360.jpg',
+      image: '',
       videoUrl: 'https://player.vimeo.com/video/1126504175?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -79,7 +79,7 @@ const initialData: SiteData = {
       titleAr: 'Get',
       descriptionEn: 'Creative content creation',
       descriptionAr: 'إنتاج محتوى إبداعي',
-      image: 'https://i.vimeocdn.com/video/2068977257-e02d7b5a775d12d7efb96daa88d06f45a7c12dcdd9c7b39bb3e8fdbe0acf2ce5-d_640x360.jpg',
+      image: '',
       videoUrl: 'https://player.vimeo.com/video/1126504193?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -88,7 +88,7 @@ const initialData: SiteData = {
       titleAr: 'إسمع للناجحين ، تنجح',
       descriptionEn: 'Motivational content',
       descriptionAr: 'محتوى تحفيزي',
-      image: 'https://i.vimeocdn.com/video/2068977276-c7a0ffacb66f08fee1a4fc6a0a36edf4b0fc82c31bb6b58c76ebd7c10f8f8b85-d_640x360.jpg',
+      image: '',
       videoUrl: 'https://player.vimeo.com/video/1126504203?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -97,7 +97,7 @@ const initialData: SiteData = {
       titleAr: 'اكتب SFX وهبعتهملك فى فايل',
       descriptionEn: 'Video editing tips',
       descriptionAr: 'نصائح مونتاج الفيديو',
-      image: 'https://i.vimeocdn.com/video/2068977286-ad1cb3730aa7ba1c1d01ddb8f3ebf48d53bd3bef5f9e69e7eb651fbad47e3e6e-d_640x360.jpg',
+      image: '',
       videoUrl: 'https://player.vimeo.com/video/1126504212?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     },
     {
@@ -106,7 +106,7 @@ const initialData: SiteData = {
       titleAr: 'مهم جدا تعمل الاعدادات دى لكاميرا الايفون',
       descriptionEn: 'Essential iPhone camera tips',
       descriptionAr: 'نصائح أساسية لكاميرا الايفون',
-      image: 'https://i.vimeocdn.com/video/2068977299-2c7c1c4c5b91c773e7d13b8af7fc5f2ced99c1e6ea5c98ab7dc1a16b23df75f9-d_640x360.jpg',
+      image: '',
       videoUrl: 'https://player.vimeo.com/video/1126504229?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
     }
   ],
@@ -198,12 +198,18 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
       const raw = localStorage.getItem('siteData');
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SiteData>;
-        // Check if portfolio items have images - if not, clear localStorage
+        // Check if portfolio items have images - if not, or if they have old Vimeo CDN URLs, clear localStorage
         if (parsed.portfolio && parsed.portfolio.length > 0) {
-          const hasImages = parsed.portfolio.every((item: any) => item.image && item.image.trim() !== '');
-          if (!hasImages) {
-            console.log('Clearing old portfolio data without thumbnails...');
+          const hasValidImages = parsed.portfolio.every((item: any) => {
+            if (!item.image || item.image.trim() === '') return false;
+            // Clear cache if using old direct Vimeo CDN URLs (which may be expired)
+            if (item.image.includes('i.vimeocdn.com/video/')) return false;
+            return true;
+          });
+          if (!hasValidImages) {
+            console.log('🔄 One-time cache update for portfolio thumbnails...');
             localStorage.removeItem('siteData');
+            console.log('✅ Cache updated! Portfolio data will reload fresh.');
             return initialData;
           }
         }
@@ -315,17 +321,27 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      if (thumbnailsFetched.current) return;
-      
       const portfolioNeedsThumbnails = data.portfolio.some(item => item.videoUrl && !item.image);
+      
+      // Only skip if we already tried AND all items now have images
+      if (thumbnailsFetched.current && !portfolioNeedsThumbnails) return;
+      
       if (portfolioNeedsThumbnails) {
-        thumbnailsFetched.current = true;
+        console.log('🎬 Fetching Vimeo thumbnails...');
         const updatedPortfolio = await addVimeoThumbnailsToPortfolio(data.portfolio);
+        thumbnailsFetched.current = true;
+        
         if (mounted) {
-          setData(prev => ({
-            ...prev,
-            portfolio: updatedPortfolio
-          }));
+          const hasNewImages = updatedPortfolio.some(item => item.image && item.image.trim() !== '');
+          if (hasNewImages) {
+            console.log('✅ Thumbnails fetched successfully!');
+            setData(prev => ({
+              ...prev,
+              portfolio: updatedPortfolio
+            }));
+          } else {
+            console.warn('⚠️ Failed to fetch thumbnails from Vimeo API');
+          }
         }
       }
     })();

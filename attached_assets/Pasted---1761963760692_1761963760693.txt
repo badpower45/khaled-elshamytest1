@@ -1,0 +1,90 @@
+💡 الحل المقترح
+الخبر الجيد هو أن الكود الخاص بك يحتوي بالفعل على آلية لجلب صور مصغرة جديدة وصالحة تلقائياً من Vimeo باستخدام ملف src/lib/vimeoThumbnails.ts.
+
+المشكلة أن هذه الآلية لا تعمل إلا إذا كان حقل image فارغاً (if (item.videoUrl && !item.image)).
+
+لتفعيل هذا الحل، كل ما نحتاجه هو تعديل البيانات الأولية initialData في ملف src/context/SiteDataContext.tsx وإزالة روابط الصور image القديمة. هذا سيجبر الكود على جلب صور جديدة وصالحة عند تحميل الصفحة.
+
+ملف للتعديل: src/context/SiteDataContext.tsx
+
+الكود الحالي (المشكلة):
+
+TypeScript
+
+// ...
+  portfolio: [
+    {
+      id: '1',
+      titleEn: 'Before - After',
+      titleAr: 'Before - After',
+      descriptionEn: 'Professional transformation showcase',
+      descriptionAr: 'عرض التحول الاحترافي',
+      image: 'https://i.vimeocdn.com/video/2068977244-cbdfd2508890a771868d81e77aa7cd40da9ac1c59eb100951fc90c8d4bd496b2-d_640x360.jpg', // <-- رابط قديم
+      videoUrl: 'https://player.vimeo.com/video/1126504175?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    {
+      id: '2',
+      titleEn: 'Get',
+      titleAr: 'Get',
+      descriptionEn: 'Creative content creation',
+      descriptionAr: 'إنتاج محتوى إبداعي',
+      image: 'https://i.vimeocdn.com/video/2068977257-e02d7b5a775d12d7efb96daa88d06f45a7c12dcdd9c7b39bb3e8fdbe0acf2ce5-d_640x360.jpg', // <-- رابط قديم
+      videoUrl: 'https://player.vimeo.com/video/1126504193?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    // ... وهكذا لباقي الفيديوهات
+  ],
+// ...
+الكود المقترح (الحل): سأقوم بتعديل الحقل image إلى image: '' (نص فارغ) لجميع العناصر في قائمة portfolio.
+
+TypeScript
+
+// ...
+  portfolio: [
+    {
+      id: '1',
+      titleEn: 'Before - After',
+      titleAr: 'Before - After',
+      descriptionEn: 'Professional transformation showcase',
+      descriptionAr: 'عرض التحول الاحترافي',
+      image: '', // <-- سيتم الحذف لتفعيل الجلب التلقائي
+      videoUrl: 'https://player.vimeo.com/video/1126504175?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    {
+      id: '2',
+      titleEn: 'Get',
+      titleAr: 'Get',
+      descriptionEn: 'Creative content creation',
+      descriptionAr: 'إنتاج محتوى إبداعي',
+      image: '', // <-- سيتم الحذف لتفعيل الجلب التلقائي
+      videoUrl: 'https://player.vimeo.com/video/1126504193?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    {
+      id: '3',
+      titleEn: 'Listen to Successful People',
+      titleAr: 'إسمع للناجحين ، تنجح',
+      descriptionEn: 'Motivational content',
+      descriptionAr: 'محتوى تحفيزي',
+      image: '', // <-- سيتم الحذف لتفعيل الجلب التلقائي
+      videoUrl: 'https://player.vimeo.com/video/1126504203?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    {
+      id: '4',
+      titleEn: 'SFX Sound Effects',
+      titleAr: 'اكتب SFX وهبعتهملك فى فايل',
+      descriptionEn: 'Video editing tips',
+      descriptionAr: 'نصائح مونتاج الفيديو',
+      image: '', // <-- سيتم الحذف لتفعيل الجلب التلقائي
+      videoUrl: 'https://player.vimeo.com/video/1126504212?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    },
+    {
+      id: '5',
+      titleEn: 'iPhone Camera Settings',
+      titleAr: 'مهم جدا تعمل الاعدادات دى لكاميرا الايفون',
+      descriptionEn: 'Essential iPhone camera tips',
+      descriptionAr: 'نصائح أساسية لكاميرا الايفون',
+      image: '', // <-- سيتم الحذف لتفعيل الجلب التلقائي
+      videoUrl: 'https://player.vimeo.com/video/1126504229?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    }
+  ],
+// ...
+بمجرد تطبيق هذا التعديل، سيقوم الكود في SiteDataContext بجلب الصور المصغرة الصحيحة تلقائياً، وستظهر الفيديوهات في العرض الدائري (carousel) كما هو مطلوب.
