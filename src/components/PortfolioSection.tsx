@@ -43,17 +43,36 @@ export function PortfolioSection() {
               onClick={() => item.videoUrl && setSelectedVideo(item.videoUrl)}
             >
               <div className="aspect-video overflow-hidden relative">
-                <img
-                  src={item.image}
-                  alt={language === 'ar' ? item.titleAr : item.titleEn}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/640x360?text=Video+Preview';
-                  }}
-                />
+                {item.image && item.image.trim() !== '' ? (
+                  <img
+                    src={item.image}
+                    alt={language === 'ar' ? item.titleAr : item.titleEn}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const placeholder = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (placeholder) placeholder.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
                 
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {/* Gradient Placeholder - shown when no image */}
+                <div 
+                  className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center"
+                  style={{ display: item.image && item.image.trim() !== '' ? 'none' : 'flex' }}
+                >
+                  <div className="text-center">
+                    <div className="w-20 h-20 rounded-full bg-[#FFD700]/10 flex items-center justify-center mx-auto mb-4">
+                      <Play className="w-10 h-10 text-[#FFD700]" fill="currentColor" />
+                    </div>
+                    <p className="text-gray-400 text-sm font-['Inter']">
+                      {language === 'ar' ? 'اضغط للمشاهدة' : 'Click to Watch'}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Play Button Overlay on Hover */}
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <motion.div
                     className="w-16 h-16 rounded-full bg-[#FFD700] flex items-center justify-center"
                     whileHover={{ scale: 1.1 }}
