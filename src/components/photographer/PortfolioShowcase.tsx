@@ -27,9 +27,9 @@ export function PortfolioShowcase() {
         }} />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+      <div className="relative z-10">
         <motion.div
-          className="text-center mb-8 sm:mb-12 md:mb-16"
+          className="text-center mb-8 sm:mb-12 md:mb-16 px-4"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -38,19 +38,19 @@ export function PortfolioShowcase() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl text-[#FFC107] mb-3 sm:mb-4 md:mb-6 font-['Playfair_Display'] italic">
             {language === 'ar' ? 'معرض الأعمال' : 'Portfolio'}
           </h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 font-['Inter'] max-w-2xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 font-['Inter'] max-w-2xl mx-auto">
             {language === 'ar' ? 'ريلز وفيديوهات سينمائية للـ Personal Branding' : 'Reels & Cinematic Videos for Personal Branding'}
           </p>
         </motion.div>
 
         {portfolio.length === 0 && (
-          <div className="text-center text-white mb-8 p-8 bg-red-900/20 border border-red-500 rounded-xl">
+          <div className="text-center text-white mb-8 p-8 bg-red-900/20 border border-red-500 rounded-xl mx-4">
             <p className="text-xl">⚠️ {language === 'ar' ? 'لا توجد فيديوهات!' : 'No portfolio items found!'}</p>
           </div>
         )}
 
         {portfolio.length > 0 && (
-          <div className="grid gap-1.5 sm:gap-2 max-w-7xl mx-auto mb-12" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 120px))', justifyContent: 'center' }}>
+          <div className="grid gap-3 sm:gap-4 md:gap-6 mb-12 px-4 sm:px-6 md:px-8 lg:px-12" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
             {portfolio.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -60,7 +60,7 @@ export function PortfolioShowcase() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.03 }}
               >
                 <VideoCard 
                   item={item} 
@@ -73,7 +73,7 @@ export function PortfolioShowcase() {
         )}
 
         <motion.div
-          className="text-center mt-12 sm:mt-16"
+          className="text-center mt-12 sm:mt-16 px-4"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
