@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
-import { useState } from 'react';
-import { X, Play, Instagram } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { X, Play, Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -9,6 +9,7 @@ export function PortfolioShowcase() {
   const { portfolio } = data;
   const { language } = useLanguage();
   const [selectedItem, setSelectedItem] = useState<typeof portfolio[0] | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleItemClick = (item: typeof portfolio[0]) => {
     setSelectedItem(item);
@@ -16,6 +17,16 @@ export function PortfolioShowcase() {
 
   const closeLightbox = () => {
     setSelectedItem(null);
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.offsetWidth * 0.8;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -50,25 +61,56 @@ export function PortfolioShowcase() {
         )}
 
         {portfolio.length > 0 && (
-          <div className="grid gap-3 sm:gap-4 md:gap-6 mb-12 px-4 sm:px-6 md:px-8 lg:px-12" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-            {portfolio.map((item, index) => (
-              <motion.div
-                key={item.id}
-                className="cursor-pointer"
-                onClick={() => handleItemClick(item)}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.03 }}
-              >
-                <VideoCard 
-                  item={item} 
-                  index={index} 
-                  language={language}
-                />
-              </motion.div>
-            ))}
+          <div className="relative px-4 sm:px-6 md:px-8 lg:px-12">
+            {/* Navigation buttons */}
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Horizontal scroll carousel */}
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 hide-scrollbar"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {portfolio.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  className="flex-shrink-0 snap-center cursor-pointer"
+                  style={{
+                    width: 'min(85vw, 400px)',
+                  }}
+                  onClick={() => handleItemClick(item)}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  viewport={{ once: true }}
+                >
+                  <VideoCard 
+                    item={item} 
+                    index={index} 
+                    language={language}
+                    scrollContainerRef={scrollContainerRef}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -155,16 +197,51 @@ export function PortfolioShowcase() {
   );
 }
 
-function VideoCard({ item, index, language }: { 
+function VideoCard({ item, index, language, scrollContainerRef }: { 
   item: any; 
   index: number; 
   language: 'ar' | 'en';
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isCenter, setIsCenter] = useState(false);
+
+  // Check if this card is in the center of viewport
+  useEffect(() => {
+    if (!scrollContainerRef?.current || !cardRef.current) return;
+
+    const handleScroll = () => {
+      if (!scrollContainerRef.current || !cardRef.current) return;
+      
+      const container = scrollContainerRef.current;
+      const card = cardRef.current;
+      const containerRect = container.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+      
+      // Card is considered center if within 100px of container center
+      setIsCenter(distance < 100);
+    };
+
+    const container = scrollContainerRef.current;
+    container.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+    
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [scrollContainerRef]);
+
+  const scale = isCenter ? 1 : 0.85;
+  const opacity = isCenter ? 1 : 0.6;
+
   return (
-    <div className="group relative overflow-hidden rounded-lg sm:rounded-xl">
+    <div ref={cardRef} className="group relative overflow-hidden rounded-lg sm:rounded-xl transition-all duration-300" style={{ transform: `scale(${scale})`, opacity }}>
       <motion.div
         className="relative aspect-[9/16] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden border-2 border-[#FFC107]/20 hover:border-[#FFC107]/50 transition-all"
         transition={{ duration: 0.3 }}
+        whileHover={{ scale: 1.02 }}
       >
         {item.image && (
           <img 
