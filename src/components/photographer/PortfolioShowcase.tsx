@@ -62,27 +62,10 @@ export function PortfolioShowcase() {
 
         {portfolio.length > 0 && (
           <div className="relative px-4 sm:px-6 md:px-8 lg:px-12">
-            {/* Navigation buttons */}
-            <button
-              onClick={() => scroll('left')}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-
-            <button
-              onClick={() => scroll('right')}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
-              aria-label="Next"
-            >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-
             {/* Horizontal scroll carousel */}
             <div
               ref={scrollContainerRef}
-              className="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 hide-scrollbar"
+              className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 hide-scrollbar"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
@@ -110,6 +93,25 @@ export function PortfolioShowcase() {
                   />
                 </motion.div>
               ))}
+            </div>
+
+            {/* Navigation buttons - below carousel */}
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => scroll('left')}
+                className="bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <button
+                onClick={() => scroll('right')}
+                className="bg-[#FFC107]/90 hover:bg-[#FFC107] text-black rounded-full p-2 sm:p-3 shadow-lg backdrop-blur-sm transition-all"
+                aria-label="Next"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
             </div>
           </div>
         )}
