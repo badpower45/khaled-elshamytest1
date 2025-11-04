@@ -190,9 +190,15 @@ export function Footer() {
           viewport={{ once: true }}
         >
           <p className="text-gray-500 font-['Inter'] flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
-            <span>Made with</span>
-            <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-[#FFC107] fill-[#FFC107]" />
-            <span>by {language === 'ar' ? personalInfo.nameAr : personalInfo.nameEn}</span>
+            <span className="sr-only">Made by</span>
+            <a
+              href="https://addvalue.tech"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FFC107] hover:underline"
+            >
+              addvalue.tech
+            </a>
           </p>
           <p className="text-gray-500 font-['Inter'] text-xs sm:text-sm">
             © {currentYear} {language === 'ar' ? 'جميع الحقوق محفوظة' : 'All rights reserved'}
