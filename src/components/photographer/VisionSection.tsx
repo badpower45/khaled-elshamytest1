@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useSiteData } from '../../context/SiteDataContext';
 import { useLanguage } from '../../context/LanguageContext';
+import visionImage from '@/assets/vision-image.jpg';
 
 export function VisionSection() {
   const { data } = useSiteData();
@@ -47,7 +48,7 @@ export function VisionSection() {
                 viewport={{ once: true }}
               >
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1636293875439-b3125c0f1fc1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaG90b2dyYXBoZXIlMjB3b3Jrc3BhY2UlMjBlZGl0aW5nJTIwc3R1ZGlvfGVufDF8fHx8MTc1ODU3NjI0MHww&ixlib=rb-4.1.0&q=80&w=1080"
+                  src={visionImage}
                   alt="Photography workspace with editing setup"
                   className="w-full h-[250px] sm:h-[350px] md:h-[400px] lg:h-[500px] object-cover"
                 />
