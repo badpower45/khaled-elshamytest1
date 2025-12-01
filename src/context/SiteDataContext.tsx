@@ -408,11 +408,34 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
     }));
   };
 
-  const updatePortfolio = (id: string, portfolio: Partial<SiteData['portfolio'][0]>) => {
+  const updatePortfolio = async (id: string, portfolio: Partial<SiteData['portfolio'][0]>) => {
     setData(prev => ({
       ...prev,
       portfolio: prev.portfolio.map(p => p.id === id ? { ...p, ...portfolio } : p)
     }));
+
+    if (portfolio.videoUrl) {
+      const videoIdMatch = portfolio.videoUrl.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
+      if (videoIdMatch) {
+        const videoId = videoIdMatch[1];
+        try {
+          const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}`);
+          if (response.ok) {
+            const oembedData = await response.json();
+            const thumbnail = oembedData.thumbnail_url?.replace('_200x150', '_640x360');
+            if (thumbnail) {
+              console.log('✅ Auto-fetched thumbnail for video:', videoId);
+              setData(prev => ({
+                ...prev,
+                portfolio: prev.portfolio.map(p => p.id === id ? { ...p, image: thumbnail } : p)
+              }));
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to auto-fetch thumbnail for video:', videoId);
+        }
+      }
+    }
   };
 
   const updateTestimonial = (id: string, testimonial: Partial<SiteData['testimonials'][0]>) => {
