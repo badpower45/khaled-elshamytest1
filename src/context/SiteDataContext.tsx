@@ -192,23 +192,13 @@ const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => {
-    // Clear localStorage to remove old image URLs
+    // Load from localStorage, preserve all data including manual images
     try {
       const raw = localStorage.getItem('siteData');
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SiteData>;
-        // Clear cache if portfolio has any image URLs (we want empty images only)
-        if (parsed.portfolio && parsed.portfolio.length > 0) {
-          const hasAnyImages = parsed.portfolio.some((item: any) => item.image && item.image.trim() !== '');
-          if (hasAnyImages) {
-            console.log('🔄 Clearing old portfolio images...');
-            localStorage.removeItem('siteData');
-            console.log('✅ Portfolio will show with dark backgrounds only.');
-            return initialData;
-          }
-        }
         
-        // import deepMerge from above local helper if available; replicate minimal merge here
+        // Deep merge to ensure all required fields exist
         function shallowMerge(base: any, ov: any) {
           if (!ov) return base;
           const out: any = Array.isArray(base) ? ov : { ...base };
@@ -286,19 +276,9 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
         if (rows && rows.length && mounted) {
           const remote = rows[0].data as Partial<SiteData> | null;
           if (remote) {
-            // Check if remote portfolio items have images
-            const hasImages = remote.portfolio && remote.portfolio.length > 0 
-              ? remote.portfolio.every((item: any) => item.image && item.image.trim() !== '')
-              : false;
-            
-            if (!hasImages && remote.portfolio && remote.portfolio.length > 0) {
-              console.log('Remote portfolio data missing thumbnails, updating Supabase...');
-              // Update Supabase with new data that has thumbnails
-              await supabase.from('site').upsert({ id: 1, data: initialData });
-              setData(initialData);
-            } else {
-              setData(deepMerge(initialData, remote) as SiteData);
-            }
+            // Always use remote data, preserving manual images
+            console.log('📦 Loaded data from Supabase');
+            setData(deepMerge(initialData, remote) as SiteData);
           }
         }
       } catch (err) {
@@ -310,63 +290,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-fetch thumbnails for portfolio videos
-  const thumbnailsFetched = useRef(false);
-  
-  useEffect(() => {
-    if (thumbnailsFetched.current) return;
-    if (!data.portfolio || data.portfolio.length === 0) return;
-    
-    let mounted = true;
-    
-    const fetchThumbnails = async () => {
-      const hasEmptyThumbnails = data.portfolio.some(item => !item.image || item.image.trim() === '');
-      
-      if (hasEmptyThumbnails) {
-        console.log('🔍 Fetching Vimeo thumbnails for', data.portfolio.length, 'videos...');
-        thumbnailsFetched.current = true;
-        
-        try {
-          const updatedPortfolio = await Promise.all(
-            data.portfolio.map(async (item) => {
-              if (item.videoUrl && (!item.image || item.image.trim() === '')) {
-                const videoIdMatch = item.videoUrl.match(/(?:player\.)?vimeo\.com\/(?:video\/)?(\d+)/);
-                if (videoIdMatch) {
-                  const videoId = videoIdMatch[1];
-                  try {
-                    const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}`);
-                    if (response.ok) {
-                      const oembedData = await response.json();
-                      const thumbnail = oembedData.thumbnail_url?.replace('_200x150', '_640x360');
-                      if (thumbnail) {
-                        console.log('✅ Fetched thumbnail for video:', videoId);
-                        return { ...item, image: thumbnail };
-                      }
-                    }
-                  } catch (err) {
-                    console.warn('Failed to fetch thumbnail for video:', videoId);
-                  }
-                }
-              }
-              return item;
-            })
-          );
-          
-          if (mounted) {
-            console.log('✅ Updated portfolio with', updatedPortfolio.length, 'videos');
-            setData(prev => ({ ...prev, portfolio: updatedPortfolio }));
-          }
-        } catch (err) {
-          console.warn('Error fetching Vimeo thumbnails:', err);
-        }
-      }
-    };
-    
-    fetchThumbnails();
-    
-    return () => { mounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.portfolio.length]);
+  // No auto-fetch - user must manually set thumbnails in admin panel
 
   useEffect(() => {
     // debounce save
