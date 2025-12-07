@@ -32,8 +32,7 @@ export function AdminPanel() {
     addAward,
     removeAward,
     updateContactInfo, 
-    updateSocialMedia,
-    setAllData 
+    updateSocialMedia
   } = useSiteData();
   const [activeTab, setActiveTab] = useState('personal');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -49,21 +48,6 @@ export function AdminPanel() {
     }
   };
 
-  const loadFromCloud = async () => {
-    try {
-      const { data: rows, error } = await supabase.from('site').select('data').eq('id', 1).limit(1);
-      if (error) return toast.error('خطأ في التحميل: ' + error.message);
-      if (rows && rows.length) {
-        setAllData(rows[0].data as any);
-        toast.success('تم التحميل من السحابة');
-      } else {
-        toast('لا يوجد بيانات في السحابة');
-      }
-    } catch (err: any) {
-      toast.error('Load error: ' + String(err?.message || err));
-    }
-  };
-
   if (!isAuthenticated) {
     return <Login onSuccess={() => setIsAuthenticated(true)} />;
   }
@@ -76,22 +60,13 @@ export function AdminPanel() {
             <h1 className="text-3xl sm:text-4xl text-[#FFC107] font-['Playfair_Display'] italic" dir="rtl">
               لوحة التحكم
             </h1>
-            <div className="flex gap-3">
-              <Button 
-                onClick={loadFromCloud} 
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white border-0 shadow-lg"
-              >
-                <span className="mr-2">📥</span>
-                تحميل من السحابة
-              </Button>
-              <Button 
-                onClick={saveToCloud} 
-                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white border-0 shadow-lg"
-              >
-                <span className="mr-2">💾</span>
-                حفظ على السحابة
-              </Button>
-            </div>
+            <Button 
+              onClick={saveToCloud} 
+              className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white border-0 shadow-lg"
+            >
+              <span className="mr-2">💾</span>
+              حفظ على السحابة
+            </Button>
           </div>
         </div>
         
