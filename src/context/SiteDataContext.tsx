@@ -181,8 +181,14 @@ interface SiteDataContextType {
   updatePersonalInfo: (info: Partial<SiteData['personalInfo']>) => void;
   updateService: (id: string, service: Partial<SiteData['services'][0]>) => void;
   updatePortfolio: (id: string, portfolio: Partial<SiteData['portfolio'][0]>) => void;
+  addPortfolio: () => void;
+  removePortfolio: (id: string) => void;
   updateTestimonial: (id: string, testimonial: Partial<SiteData['testimonials'][0]>) => void;
+  addTestimonial: () => void;
+  removeTestimonial: (id: string) => void;
   updateAward: (id: string, award: Partial<SiteData['awards'][0]>) => void;
+  addAward: () => void;
+  removeAward: (id: string) => void;
   updateContactInfo: (info: Partial<SiteData['contactInfo']>) => void;
   updateSocialMedia: (social: Partial<SiteData['socialMedia']>) => void;
   setAllData: (d: SiteData) => void;
@@ -367,8 +373,79 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
     }));
   };
 
+  const addPortfolio = () => {
+    setData(prev => ({
+      ...prev,
+      portfolio: [
+        ...prev.portfolio,
+        {
+          id: String(Date.now()),
+          titleEn: 'New Video',
+          titleAr: 'فيديو جديد',
+          descriptionEn: 'Description',
+          descriptionAr: 'الوصف',
+          image: '',
+          videoUrl: ''
+        }
+      ]
+    }));
+  };
+
+  const removePortfolio = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      portfolio: prev.portfolio.filter(p => p.id !== id)
+    }));
+  };
+
+  const addTestimonial = () => {
+    setData(prev => ({
+      ...prev,
+      testimonials: [
+        ...prev.testimonials,
+        {
+          id: String(Date.now()),
+          text: 'نص الشهادة',
+          name: 'اسم العميل',
+          position: 'المنصب',
+          company: 'الشركة'
+        }
+      ]
+    }));
+  };
+
+  const removeTestimonial = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      testimonials: prev.testimonials.filter(t => t.id !== id)
+    }));
+  };
+
+  const addAward = () => {
+    setData(prev => ({
+      ...prev,
+      awards: [
+        ...prev.awards,
+        {
+          id: String(Date.now()),
+          year: new Date().getFullYear().toString(),
+          titleEn: 'New Award',
+          titleAr: 'جائزة جديدة',
+          category: 'Category',
+          organization: 'المؤسسة'
+        }
+      ]
+    }));
+  };
+
+  const removeAward = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      awards: prev.awards.filter(a => a.id !== id)
+    }));
+  };
+
   const setAllData = (d: SiteData) => {
-    // merge with defaults to avoid missing fields causing runtime errors
     setData(deepMerge(initialData, d));
   };
 
@@ -379,8 +456,14 @@ create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at t
         updatePersonalInfo,
         updateService,
         updatePortfolio,
+        addPortfolio,
+        removePortfolio,
         updateTestimonial,
+        addTestimonial,
+        removeTestimonial,
         updateAward,
+        addAward,
+        removeAward,
         updateContactInfo,
         updateSocialMedia,
         setAllData

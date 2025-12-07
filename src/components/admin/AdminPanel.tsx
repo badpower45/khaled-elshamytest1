@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save } from 'lucide-react';
+import { User, Briefcase, Image, MessageSquare, Award, Mail, Share2, Save, Plus, Trash2 } from 'lucide-react';
 import { useSiteData } from '../../context/SiteDataContext';
 import { ImageUploadField } from './ImageUploadField';
 import { Button } from '../ui/button';
@@ -18,10 +18,25 @@ function handleSave(section: string) {
 }
 
 export function AdminPanel() {
-  const { data, updatePersonalInfo, updateService, updatePortfolio, updateTestimonial, updateAward, updateContactInfo, updateSocialMedia } = useSiteData();
+  const { 
+    data, 
+    updatePersonalInfo, 
+    updateService, 
+    updatePortfolio, 
+    addPortfolio,
+    removePortfolio,
+    updateTestimonial, 
+    addTestimonial,
+    removeTestimonial,
+    updateAward, 
+    addAward,
+    removeAward,
+    updateContactInfo, 
+    updateSocialMedia,
+    setAllData 
+  } = useSiteData();
   const [activeTab, setActiveTab] = useState('personal');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { setAllData } = useSiteData();
 
   const saveToCloud = async () => {
     try {
@@ -365,10 +380,28 @@ export function AdminPanel() {
               </Card>
 
               {data.portfolio.map((item, index) => (
-                <Card key={item.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
-                  <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
-                    عمل {index + 1}
-                  </h3>
+                <Card key={item.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6 relative">
+                  <div className="flex items-center justify-between mb-4">
+                    <Button
+                      onClick={() => {
+                        if (data.portfolio.length > 1) {
+                          removePortfolio(item.id);
+                          toast.success('تم حذف العمل');
+                        } else {
+                          toast.error('يجب أن يكون هناك عمل واحد على الأقل');
+                        }
+                      }}
+                      variant="destructive"
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      حذف
+                    </Button>
+                    <h3 className="text-xl text-[#FFC107] font-['Playfair_Display'] text-right">
+                      عمل {index + 1}
+                    </h3>
+                  </div>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -440,7 +473,17 @@ export function AdminPanel() {
                 </Card>
               ))}
 
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <Button 
+                  onClick={() => {
+                    addPortfolio();
+                    toast.success('تم إضافة عمل جديد');
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  إضافة عمل جديد
+                </Button>
                 <Button 
                   onClick={() => handleSave('المعرض')}
                   className="bg-[#FFC107] text-black hover:bg-[#FFD54F]"
@@ -457,9 +500,27 @@ export function AdminPanel() {
             <div className="space-y-6">
               {data.testimonials.map((testimonial, index) => (
                 <Card key={testimonial.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
-                  <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
-                    شهادة {index + 1}
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <Button
+                      onClick={() => {
+                        if (data.testimonials.length > 1) {
+                          removeTestimonial(testimonial.id);
+                          toast.success('تم حذف الشهادة');
+                        } else {
+                          toast.error('يجب أن تكون هناك شهادة واحدة على الأقل');
+                        }
+                      }}
+                      variant="destructive"
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      حذف
+                    </Button>
+                    <h3 className="text-xl text-[#FFC107] font-['Playfair_Display'] text-right">
+                      شهادة {index + 1}
+                    </h3>
+                  </div>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
@@ -505,7 +566,17 @@ export function AdminPanel() {
                 </Card>
               ))}
 
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <Button 
+                  onClick={() => {
+                    addTestimonial();
+                    toast.success('تم إضافة شهادة جديدة');
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  إضافة شهادة جديدة
+                </Button>
                 <Button 
                   onClick={() => handleSave('الشهادات')}
                   className="bg-[#FFC107] text-black hover:bg-[#FFD54F]"
@@ -522,9 +593,27 @@ export function AdminPanel() {
             <div className="space-y-6">
               {data.awards.map((award, index) => (
                 <Card key={award.id} className="bg-gray-700/95 border-[#FFC107]/40 p-6">
-                  <h3 className="text-xl text-[#FFC107] mb-4 font-['Playfair_Display'] text-right">
-                    جائزة {index + 1}
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <Button
+                      onClick={() => {
+                        if (data.awards.length > 1) {
+                          removeAward(award.id);
+                          toast.success('تم حذف الجائزة');
+                        } else {
+                          toast.error('يجب أن تكون هناك جائزة واحدة على الأقل');
+                        }
+                      }}
+                      variant="destructive"
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      حذف
+                    </Button>
+                    <h3 className="text-xl text-[#FFC107] font-['Playfair_Display'] text-right">
+                      جائزة {index + 1}
+                    </h3>
+                  </div>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -577,7 +666,17 @@ export function AdminPanel() {
                 </Card>
               ))}
 
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <Button 
+                  onClick={() => {
+                    addAward();
+                    toast.success('تم إضافة جائزة جديدة');
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  إضافة جائزة جديدة
+                </Button>
                 <Button 
                   onClick={() => handleSave('الجوائز')}
                   className="bg-[#FFC107] text-black hover:bg-[#FFD54F]"
