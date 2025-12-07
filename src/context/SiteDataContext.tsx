@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { SiteData } from '../types';
 import khaledImage from 'figma:asset/6f9a3b49d9d5a7cf854a44a26780766d0a9dba89.png';
@@ -239,8 +239,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     }
   }, [data]);
 
-  // Sync with Supabase: fetch on mount, then debounce-upsert on changes
-  const saveTimeout = useRef<number | null>(null);
+  // Sync with Supabase: fetch on mount only (save is manual via admin panel)
 
   // small deep-merge to ensure remote partial data doesn't remove required fields
   function deepMerge<T>(base: T, override: Partial<T>): T {
@@ -296,33 +295,8 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // No auto-fetch - user must manually set thumbnails in admin panel
-
-  useEffect(() => {
-    // debounce save
-    if (saveTimeout.current) {
-      window.clearTimeout(saveTimeout.current);
-    }
-    saveTimeout.current = window.setTimeout(async () => {
-      try {
-  const payload = [{ id: 1, data }];
-  const { error } = await supabase.from('site').upsert(payload);
-        if (error) {
-          console.warn('Supabase upsert error:', error.message);
-          // If table missing, log SQL to create it
-          if (error.message && /relation .* does not exist/.test(error.message)) {
-            console.info(`Run this SQL in Supabase SQL editor to create table:\n
-create table public.site (\n  id int primary key,\n  data jsonb,\n  updated_at timestamptz default now()\n);\n\ninsert into public.site (id, data) values (1, '{}');`);
-          }
-        }
-      } catch (err) {
-        console.warn('Supabase upsert failed:', err);
-      }
-    }, 1500);
-
-    return () => { if (saveTimeout.current) window.clearTimeout(saveTimeout.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  // Auto-save disabled - user must click "Save to Cloud" button in admin panel
+  // This prevents accidental overwrites of existing data
 
   const updatePersonalInfo = (info: Partial<SiteData['personalInfo']>) => {
     setData(prev => ({
